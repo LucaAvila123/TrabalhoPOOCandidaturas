@@ -112,15 +112,83 @@ public class Relatorio {
         }
         
     }
-    // Relatorio 6: 
+    // Relatorio 6: votos totalizados por partido e número de candidatos eleitos
+    public void imprimeVotacaoDosPartidos(){
+        ArrayList <Partido> partidosVotados = sistema.CopiaPartidosVotados();
+        int i = 0;
+        for (Partido partido : partidosVotados) {
+            i++;
+            System.out.println(i + " - " + partido.getSigla() + " - " + partido.getNumeroDoPartido() + ", " + this.nf.format(partido.getVotosValidos()) + " votos (" + this.nf.format(partido.getVotosNominais()) + " nominais e " + this.nf.format(partido.getVotosDeLegenda()) + " de legenda), " + partido.StringCandidatosEleitos());
+        }
+    }
 
     // Relatorio 7: IGNORADO, por ordens do professor
 
-    // Relatorio 8
+    // Relatorio 8: primeiro e último colocados de cada partido
+    public void imprimePrimeiro_eUltimo(){
+        // lógica aqui: a ordem depende do candidato mais votado do partido
+        // criando uma nova lista de partidos a partir do candidato mais votado (e só dele)
+        // TODO lidar com empate 
+        ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
+        ArrayList<Partido> partidosTotal = new ArrayList<>();
+        
+        for (Candidato candidato : candidatosMaisVotados) {
+            if(partidosTotal.contains(candidato.getPartido()) == false){
+                partidosTotal.add(candidato.getPartido());
+            }
+        }
+
+        // depois de toda a lista de candidatos percorrida, fica a lista de partidos para imprimir
+        System.out.println("Primeiro e último colocados de cada partido:");
+        Partido partido;
+        Candidato primeiroColocado;
+        Candidato ultimoColocado;
+        for(int i = 0; i < partidosTotal.size(); i++){
+            partido = partidosTotal.get(i);
+            if(partido.getVotosValidos() > 0){
+                primeiroColocado = partido.getCandidatosPartido().get(0);
+                ultimoColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size());
+
+                // usando printf para organização (não coloquei nos outros ainda, mas ok)
+                System.out.printf("%d - %s - %d, %s (%d, %d votos)", i+1, partido.getSigla(), partido.getNumeroDoPartido(), primeiroColocado.getNomeDeUrna(), primeiroColocado.getNumeroDoCandidato(), this.nf.format(primeiroColocado.getTotalDeVotos()));
+                System.out.printf("/ %s (%d, %d votos)\n", ultimoColocado.getNomeDeUrna(), ultimoColocado.getNumeroDoCandidato(), this.nf.format(ultimoColocado.getTotalDeVotos()));
+            }
+        }
+    }
     
-    // Relatorio 9
+    // Relatorio 9: faixas etarias
+    public void imprimeFaixasEtarias(){
+
+        // TODO processamento das idades
+        ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
+        int menoresDe30 = 0;
+        int de30a40 = 0;
+        int de40a50 = 0;
+        int de50a60 = 0;
+        int maioresDe60 = 0;
+
+        System.out.println("Eleitos por faixa etária (na data da eleição):");
+        System.out.println("      Idade < 30: " + menoresDe30 + " (" + this.nf.format((float) 100*menoresDe30/candidatosMaisVotados.size()) + "%)");
+        System.out.println("30 <= Idade < 40: " + de30a40 + " (" + this.nf.format((float) 100*de30a40/candidatosMaisVotados.size()) + "%)");
+        System.out.println("40 <= Idade < 50: " + de40a50 + " (" + this.nf.format((float) 100*de40a50/candidatosMaisVotados.size()) + "%)");
+        System.out.println("50 <= Idade < 60: " + de50a60 + " (" + this.nf.format((float) 100*de50a60/candidatosMaisVotados.size()) + "%)");
+        System.out.println("60 <= Idade     : " + maioresDe60 + " (" + this.nf.format((float) 100*maioresDe60/candidatosMaisVotados.size()) + "%)");
+     
+    }
     
-    // Relatorio 10
+    // Relatorio 10: eleitos por gênero
+    public void imprimeGeneros(){
+        
+        // TODO processamento de votações por gênero
+        ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
+        int totalFeminino = 0;
+        int totalMasculino = 0;
+
+        System.out.println("Eleitos, por gênero:");
+        System.out.println("Feminino:  " + totalFeminino + " (" + this.nf.format((float) 100*totalFeminino/candidatosMaisVotados.size()));
+        System.out.println("Masculino: " + totalMasculino + " (" + this.nf.format((float) 100*totalMasculino/candidatosMaisVotados.size()));
+
+    }
     
     // Relatório 11: Total de votos válidos, total de votos nominais e total de votos de legenda
     public void imprimeTotalDeVotosDeCadaTipo(){

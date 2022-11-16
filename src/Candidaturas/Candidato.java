@@ -1,4 +1,6 @@
 package Candidaturas;
+import java.text.*;
+import java.util.*;
 
 public class Candidato {
     //Dados para o Candidato
@@ -74,10 +76,13 @@ public class Candidato {
     //nao sei classificar essas funcoes
 
 
-    //deve retornar a idade do candidato na data indicada (vou deixar a idade em dias para calcular comparações)
-    public int getIdade(String data){
-        
-        return 0;
+    //deve retornar a idade do candidato na data indicada em sua construção 
+    public long getIdade() throws ParseException{
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        Date data = formato.parse(dataDeNascimento);
+
+        // só para comparações, não terá calculada a idade de fato
+        return data.getTime();
     }
 
     //serve para incrementar os votos do candidato

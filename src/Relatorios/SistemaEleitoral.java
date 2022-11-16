@@ -13,6 +13,9 @@ public class SistemaEleitoral {
     // enquanto a tabela é usada para calcular os valores, a lista para ordenar a quantidade de votos total
     private List<Candidato> CandidatosMaisVotados;
 
+    // acho que essa lista aqui é dispensável, é bom repensar
+    private List<Partido> PartidosVotados;
+
     // número de votos (válidos, nominais e de legenda)
     private int totalDeVotosValidos = 0;
     private int totalDeVotosNominais = 0;
@@ -25,6 +28,7 @@ public class SistemaEleitoral {
         this.PartidosParticipantes = new HashMap<>();
         this.CandidatosParticipantes = new HashMap<>();
         this.CandidatosMaisVotados = new ArrayList<>();
+        this.PartidosVotados = new ArrayList<>();
     }
 
     //Getters
@@ -38,9 +42,15 @@ public class SistemaEleitoral {
         return totalDeVotosNominais;
     }
 
+    // gera cópias de cada lista usada no código
     public ArrayList<Candidato> CopiaCandidatosMaisVotados(){
         return new ArrayList<>(CandidatosMaisVotados);
     }
+
+    public ArrayList<Partido> CopiaPartidosVotados(){
+        return new ArrayList<>(PartidosVotados);
+    }
+
     // funções que retornam número de vagas pra estadual e federal (devo colocar isso em alguma classe no futuro)
     public int getNumeroVagas(){
         return numeroDeVagas;
@@ -103,8 +113,19 @@ public class SistemaEleitoral {
 
     // reordena a lista de candidatos de acordo com número de votos
     // função estática para poder manipular as listas de candidatos de cada Partido também
-    public static void reordenaLista(ArrayList<Candidato> listaCandidatos){
+    public static void reordenaLista(List<Candidato> listaCandidatos){
         Collections.sort(listaCandidatos, new MaisVotos());
+    }
+
+    // reordena cada lista de candidato de partido e a lista de candidatos mais votados
+    public void reordenaTodasListas(){
+        for (Partido partido : PartidosVotados) {
+            partido.reordenaListaNoPartido();
+        }
+        SistemaEleitoral.reordenaLista(CandidatosMaisVotados);
+
+        // não precisa ser criada uma função específica para reordenar a lista de partidos
+        Collections.sort(PartidosVotados, new MaisVotosPartido());
     }
 
     // calcula o número de vagas da eleicao

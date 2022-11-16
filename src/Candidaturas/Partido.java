@@ -2,6 +2,8 @@ package Candidaturas;
 
 import java.util.*;
 
+import Relatorios.SistemaEleitoral;
+
 public class Partido {
     private int numeroDoPartido;
     private String sigla;
@@ -37,6 +39,10 @@ public class Partido {
         return votosDeLegenda;
     }
 
+    public int getVotosNominais() {
+        return votosNominais;
+    }
+
     public List<Candidato> getCandidatosPartido(){
         return new ArrayList<Candidato>(candidatosPartido);
     }
@@ -61,4 +67,32 @@ public class Partido {
         votosValidos = votosDeLegenda + votosNominais;
     }
 
+    public void reordenaListaNoPartido(){
+        SistemaEleitoral.reordenaLista(candidatosPartido);
+    }
+
+    // calculando quantidade de candidatos eleitos
+    public int getCandidatosEleitos(){
+        int i = 0;
+        for (Candidato candidato : candidatosPartido) {
+            if(candidato.foiEleito() == true){
+                i++;
+            }
+        }
+
+        return i;
+    }
+    
+    public String StringCandidatosEleitos(){
+        int totalCandidatosEleitos = this.getCandidatosEleitos();
+        String quantosEleitos = totalCandidatosEleitos + " ";
+        if(totalCandidatosEleitos > 1){
+            quantosEleitos += "candidatos eleitos";
+        }
+        else{
+            quantosEleitos += "candidato eleito";
+        }
+
+        return quantosEleitos;
+    }
 }
