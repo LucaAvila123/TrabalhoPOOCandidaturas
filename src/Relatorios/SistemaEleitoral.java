@@ -101,9 +101,10 @@ public class SistemaEleitoral {
         totalDeVotosValidos = totalDeVotosDeLegenda + totalDeVotosNominais;
     }
 
-    // reordena a lista de Candidatos de acordo com número de votos
-    public void reordenaLista(){
-        Collections.sort(CandidatosMaisVotados, new MaisVotos());
+    // reordena a lista de candidatos de acordo com número de votos
+    // função estática para poder manipular as listas de candidatos de cada Partido também
+    public static void reordenaLista(ArrayList<Candidato> listaCandidatos){
+        Collections.sort(listaCandidatos, new MaisVotos());
     }
 
     // calcula o número de vagas da eleicao
@@ -117,6 +118,6 @@ public class SistemaEleitoral {
         numeroDeVagas = i;
     }
 
-
+    
 
 }

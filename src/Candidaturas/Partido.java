@@ -1,7 +1,6 @@
 package Candidaturas;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Partido {
     private int numeroDoPartido;
@@ -12,12 +11,13 @@ public class Partido {
     private int votosDeLegenda = 0; 
 
     // a lista aqui é a estrutura de dados escolhida porque não será necessário acessar diretamente os valores
-    private List<Candidato> candidatosPartido = new LinkedList<>();
+    private List<Candidato> candidatosPartido;
 
     //Constructor
     public Partido(int numeroDoPartido, String sigla) {
         this.numeroDoPartido = numeroDoPartido;
         this.sigla = sigla;
+        this.candidatosPartido = new ArrayList<>();
     }
 
     //Getters
@@ -38,7 +38,7 @@ public class Partido {
     }
 
     public List<Candidato> getCandidatosPartido(){
-        return new LinkedList<Candidato>(candidatosPartido);
+        return new ArrayList<Candidato>(candidatosPartido);
     }
 
     public void adicionaCandidato(Candidato candidato){
