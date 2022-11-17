@@ -156,10 +156,11 @@ public class Relatorio {
                 int j = 1;
                 // vai subtraindo uma posicao pra cada vez que tiver um valor igual
                 while(intermediarioColocado != null && intermediarioColocado.getTotalDeVotos() == ultimoColocado.getTotalDeVotos()){
+                    ultimoColocado = intermediarioColocado;
                     j++;
                     intermediarioColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size() - j);
                 }
-                ultimoColocado = intermediarioColocado;
+                
 
                 // usando printf para organização (não coloquei nos outros ainda, mas ok)
                 System.out.printf("%d - %s - %d, %s (%d, %d votos)", i+1, partido.getSigla(), partido.getNumeroDoPartido(), primeiroColocado.getNomeDeUrna(), primeiroColocado.getNumeroDoCandidato(), this.nf.format(primeiroColocado.getTotalDeVotos()));
