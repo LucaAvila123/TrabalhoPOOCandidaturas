@@ -157,9 +157,8 @@ public class Relatorio {
     }
     
     // Relatorio 9: faixas etarias
-    public void imprimeFaixasEtarias(){
-
-        // TODO processamento das idades
+    public void imprimeFaixasEtarias() throws ParseException{
+        
         ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         int menoresDe30 = 0;
         int de30a40 = 0;
@@ -167,6 +166,24 @@ public class Relatorio {
         int de50a60 = 0;
         int maioresDe60 = 0;
 
+        for (Candidato candidato : candidatosMaisVotados) {
+            if(candidato.getIdade() < 30){
+                menoresDe30++;
+            }
+            else if(candidato.getIdade() < 40){
+                de30a40++;
+            }
+            else if(candidato.getIdade() < 50){
+                de40a50++;
+            }
+            else if(candidato.getIdade() < 60){
+                de50a60++;
+            }
+            else if(candidato.getIdade() >= 60){
+                maioresDe60++;
+            }
+            
+        }
         System.out.println("Eleitos por faixa etária (na data da eleição):");
         System.out.println("      Idade < 30: " + menoresDe30 + " (" + this.nf.format((float) 100*menoresDe30/candidatosMaisVotados.size()) + "%)");
         System.out.println("30 <= Idade < 40: " + de30a40 + " (" + this.nf.format((float) 100*de30a40/candidatosMaisVotados.size()) + "%)");
@@ -178,12 +195,20 @@ public class Relatorio {
     
     // Relatorio 10: eleitos por gênero
     public void imprimeGeneros(){
-        
-        // TODO processamento de votações por gênero
         ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         int totalFeminino = 0;
         int totalMasculino = 0;
 
+        for (Candidato candidato : candidatosMaisVotados) {
+            // codigo Masculino
+            if(candidato.getGenero() == 2){
+                totalMasculino++;
+            }
+            // codigo Feminino
+            if(candidato.getGenero() == 4){
+                totalFeminino++;
+            }
+        }
         System.out.println("Eleitos, por gênero:");
         System.out.println("Feminino:  " + totalFeminino + " (" + this.nf.format((float) 100*totalFeminino/candidatosMaisVotados.size()));
         System.out.println("Masculino: " + totalMasculino + " (" + this.nf.format((float) 100*totalMasculino/candidatosMaisVotados.size()));

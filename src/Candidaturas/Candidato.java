@@ -1,6 +1,7 @@
 package Candidaturas;
 import java.text.*;
-import java.util.*;
+import java.time.*;
+import java.time.temporal.*;
 
 public class Candidato {
     //Dados para o Candidato
@@ -12,7 +13,7 @@ public class Candidato {
     private int codigoDoCargo;
     private int numeroDaFederacao;
     private int numeroDoCandidato;
-    private int genero;
+    private int genero; 
     private int situacaoDaTotalizacao; // define se o candidato foi eleito 
 
     private int totalDeVotos = 0; //valor default
@@ -26,7 +27,7 @@ public class Candidato {
         this.codigoDoCargo = codigoDoCargo; // determina se é estadual (7) ou federal (6)
         this.numeroDaFederacao = numeroDaFederacao;
         this.numeroDoCandidato = numeroDoCandidato;
-        this.genero = genero;
+        this.genero = genero; // 2 representa masculino e 4 representa feminino
         this.situacaoDaTotalizacao = situacaoDaTotalizacao;
     }
 
@@ -77,12 +78,20 @@ public class Candidato {
 
 
     //deve retornar a idade do candidato na data indicada em sua construção 
-    public long getIdade() throws ParseException{
-        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-        Date data = formato.parse(dataDeNascimento);
+    public int getIdade() throws ParseException{
 
-        // só para comparações, não terá calculada a idade de fato
-        return data.getTime();
+        // talvez conste usar a data da eleição descrita no CSV pra fazer isso aqui
+        String manipulandoData[] = dataDeNascimento.split("/");
+        int diaNascimento = Integer.parseInt(manipulandoData[0]);
+        int mesNascimento = Integer.parseInt(manipulandoData[1]);
+        int anoNascimento = Integer.parseInt(manipulandoData[2]);
+        LocalDateTime dataCandidato = LocalDateTime.of(anoNascimento, mesNascimento, diaNascimento, 0, 0, 0);
+        // a data da eleição de 2022 foi dia 02/10/2022; talvez seja útil mudar pra ficar integrado com o CSV
+        LocalDateTime hoje = LocalDateTime.of(2022, 10, 2, 0, 0, 0);
+
+        //calcula diferença
+        int anos = (int) dataCandidato.until(hoje, ChronoUnit.YEARS);
+        return anos;
     }
 
     //serve para incrementar os votos do candidato

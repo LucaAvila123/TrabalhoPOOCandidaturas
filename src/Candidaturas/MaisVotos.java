@@ -12,12 +12,14 @@ public class MaisVotos implements Comparator<Candidato> {
         
         // se há empate no número de votos de cada candidato
         if(ordem == 0){
+            
             try {
-                return (int) (b.getIdade() - a.getIdade());
+                return b.getIdade() - a.getIdade();
             } catch (ParseException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+           
         }
         return ordem;
     }
