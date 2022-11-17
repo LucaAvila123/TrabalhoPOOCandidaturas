@@ -128,12 +128,12 @@ public class Relatorio {
     public void imprimePrimeiro_eUltimo(){
         // lógica aqui: a ordem depende do candidato mais votado do partido
         // criando uma nova lista de partidos a partir do candidato mais votado (e só dele)
-        // TODO lidar com empate 
         ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         ArrayList<Partido> partidosTotal = new ArrayList<>();
         
         for (Candidato candidato : candidatosMaisVotados) {
-            if(partidosTotal.contains(candidato.getPartido()) == false){
+            // vai ignorar partidos que não tenham número positivo de votos
+            if(candidato.getTotalDeVotos() > 0 && partidosTotal.contains(candidato.getPartido()) == false){
                 partidosTotal.add(candidato.getPartido());
             }
         }
@@ -143,11 +143,23 @@ public class Relatorio {
         Partido partido;
         Candidato primeiroColocado;
         Candidato ultimoColocado;
+
+        // candidato posto para colocar o canddidato mais velho em caso de empate
+        Candidato intermediarioColocado;
         for(int i = 0; i < partidosTotal.size(); i++){
             partido = partidosTotal.get(i);
             if(partido.getVotosValidos() > 0){
                 primeiroColocado = partido.getCandidatosPartido().get(0);
-                ultimoColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size());
+                ultimoColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size() -1);
+                intermediarioColocado = ultimoColocado;
+
+                int j = 1;
+                // vai subtraindo uma posicao pra cada vez que tiver um valor igual
+                while(intermediarioColocado != null && intermediarioColocado.getTotalDeVotos() == ultimoColocado.getTotalDeVotos()){
+                    j++;
+                    intermediarioColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size() - j);
+                }
+                ultimoColocado = intermediarioColocado;
 
                 // usando printf para organização (não coloquei nos outros ainda, mas ok)
                 System.out.printf("%d - %s - %d, %s (%d, %d votos)", i+1, partido.getSigla(), partido.getNumeroDoPartido(), primeiroColocado.getNomeDeUrna(), primeiroColocado.getNumeroDoCandidato(), this.nf.format(primeiroColocado.getTotalDeVotos()));
@@ -158,7 +170,7 @@ public class Relatorio {
     
     // Relatorio 9: faixas etarias
     public void imprimeFaixasEtarias() throws ParseException{
-        
+
         ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         int menoresDe30 = 0;
         int de30a40 = 0;
