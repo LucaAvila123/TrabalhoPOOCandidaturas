@@ -10,16 +10,22 @@ public class MaisVotos implements Comparator<Candidato> {
         // a ideia é deixar a ordem decrescente 
         int ordem = b.getTotalDeVotos() - a.getTotalDeVotos();
         
-        // se há empate no número de votos de cada candidato
+        // se há empate no número de votos de cada candidato, usa a idade
         if(ordem == 0){
-            
+            // verificando se b é mais velho que a
             try {
-                return b.getIdade() - a.getIdade();
+                int diferencaIdade = b.getIdade() - a.getIdade();
+
+                // se os dois tiverem a mesma idade, tem que usar o número do candidato
+                if(diferencaIdade == 0){
+                    int menorNumero = a.getNumeroDoCandidato() - b.getNumeroDoCandidato();
+
+                    return menorNumero;
+                }
+                return diferencaIdade;
             } catch (ParseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-           
         }
         return ordem;
     }
