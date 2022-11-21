@@ -3,6 +3,8 @@ import java.text.*;
 import java.time.*;
 import java.time.temporal.*;
 
+import Enum.Eleito;
+
 public class Candidato {
     //Dados para o Candidato
     private Partido partido;
@@ -17,7 +19,7 @@ public class Candidato {
     private int situacaoDaTotalizacao; // define se o candidato foi eleito 
 
     private int totalDeVotos = 0; //valor default
-
+    
     //Construtor
     public Candidato(Partido partido, String nomeDeUrna, String dataDeNascimento, int codigoDoCargo,
             int numeroDaFederacao, int numeroDoCandidato, int genero, int situacaoDaTotalizacao) {
@@ -29,6 +31,7 @@ public class Candidato {
         this.numeroDoCandidato = numeroDoCandidato;
         this.genero = genero; // 2 representa masculino e 4 representa feminino
         this.situacaoDaTotalizacao = situacaoDaTotalizacao;
+        
     }
 
     //Getters
@@ -60,9 +63,11 @@ public class Candidato {
         return genero;
     }
     
-    // os números 2  e 3 na situação de totalização dizem se o candidato foi eleito
+    
+    
+    // os números 2  e 16 na situação de totalização dizem se o candidato foi eleito
     public boolean foiEleito(){
-        return this.situacaoDaTotalizacao == 2 || this.situacaoDaTotalizacao == 3;
+        return Eleito.igualEleito(this.situacaoDaTotalizacao);
     }
 
     // o número -1 indica que o candidato não participa de federação
