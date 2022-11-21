@@ -3,8 +3,8 @@ import java.text.*;
 import java.time.*;
 import java.time.temporal.*;
 
-import Estaticos.DataEleicao;
-import Estaticos.Eleito;
+import Estaticos.*;
+
 
 public class Candidato {
     //Dados para o Candidato
@@ -17,13 +17,16 @@ public class Candidato {
     private int numeroDaFederacao;
     private int numeroDoCandidato;
     private int genero; 
+    private int deferido;
     private int situacaoDaTotalizacao; // define se o candidato foi eleito 
+    private String destinoVotos; // fala se o candidato dá votos de legenda
 
     private int totalDeVotos = 0; //valor default
     
     //Construtor
     public Candidato(Partido partido, String nomeDeUrna, String dataDeNascimento, int codigoDoCargo,
-            int numeroDaFederacao, int numeroDoCandidato, int genero, int situacaoDaTotalizacao) {
+            int numeroDaFederacao, int numeroDoCandidato, int genero, int situacaoDaTotalizacao, int deferido,
+            String destinoVotos) {
         this.partido = partido;
         this.nomeDeUrna = nomeDeUrna;
         this.dataDeNascimento = dataDeNascimento; 
@@ -32,6 +35,8 @@ public class Candidato {
         this.numeroDoCandidato = numeroDoCandidato;
         this.genero = genero; 
         this.situacaoDaTotalizacao = situacaoDaTotalizacao;
+        this.deferido = deferido;
+        this.destinoVotos = destinoVotos;
         
     }
 
@@ -64,7 +69,15 @@ public class Candidato {
         return genero;
     }
     
-    
+    // foi deferido
+    public boolean foiDeferido(){
+        return Deferido.igualDeferido(deferido);
+    }
+
+    // vai pra legenda
+    public boolean destinoVotosLegenda(){
+        return Legenda.vaiPraLegenda(destinoVotos);
+    }
     
     // os números 2  e 16 na situação de totalização dizem se o candidato foi eleito
     public boolean foiEleito(){
@@ -73,7 +86,7 @@ public class Candidato {
 
     // o número -1 indica que o candidato não participa de federação
     public boolean ehDeFederacao(){
-        return Eleito.ehFederado(numeroDaFederacao);
+        return Federado.ehFederado(numeroDaFederacao);
     }
 
     public int getTotalDeVotos() {
