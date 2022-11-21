@@ -4,7 +4,6 @@ import java.io.*;
 
 import Candidaturas.*;
 import Estaticos.*;
-import Exceptions.*;
 
 public class App {
     public static void main(String[] args) throws Exception {
