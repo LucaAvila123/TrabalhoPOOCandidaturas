@@ -1,6 +1,6 @@
 package Relatorios;
 import Candidaturas.*;
-import Enum.Genero;
+import Estaticos.Genero;
 
 import java.text.*;
 import java.util.*;
