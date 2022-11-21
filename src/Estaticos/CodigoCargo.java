@@ -1,4 +1,4 @@
-package Enum;
+package Estaticos;
 
 // acredito que este enum será usado mais na main
 public enum CodigoCargo {

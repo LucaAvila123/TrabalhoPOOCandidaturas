@@ -3,8 +3,8 @@ import java.text.*;
 import java.time.*;
 import java.time.temporal.*;
 
-import Enum.DataEleicao;
-import Enum.Eleito;
+import Estaticos.DataEleicao;
+import Estaticos.Eleito;
 
 public class Candidato {
     //Dados para o Candidato
@@ -73,7 +73,7 @@ public class Candidato {
 
     // o número -1 indica que o candidato não participa de federação
     public boolean ehDeFederacao(){
-        return this.getNumeroDaFederacao() != -1;
+        return Eleito.ehFederado(numeroDaFederacao);
     }
 
     public int getTotalDeVotos() {

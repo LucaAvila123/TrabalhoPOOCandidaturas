@@ -1,4 +1,4 @@
-package Enum;
+package Estaticos;
 
 public enum Genero {
     MASCULINO(2), FEMININO(4);
