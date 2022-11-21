@@ -44,7 +44,14 @@ public class App {
                 if(separando[i].equals("NM_TIPO_DESTINACAO_VOTOS")) NM_TIPO_DESTINACAO_VOTOS_index = i;
             }
             
+            linha = buffRead.readLine();
+            while(linha != null){
+                separando = linha.split(";");
+
+                linha = buffRead.readLine();
+            }
             buffRead.close();
+
         } catch (Exception e) {
             System.out.println("Arquivo de candidatos não encontrado");
         }
