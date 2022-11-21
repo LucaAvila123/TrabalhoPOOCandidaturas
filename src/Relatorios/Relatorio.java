@@ -1,5 +1,6 @@
 package Relatorios;
 import Candidaturas.*;
+import Enum.Genero;
 
 import java.text.*;
 import java.util.*;
@@ -214,11 +215,11 @@ public class Relatorio {
 
         for (Candidato candidato : candidatosMaisVotados) {
             // codigo Masculino
-            if(candidato.getGenero() == 2){
+            if(candidato.getGenero() == Genero.MASCULINO.getGenero()){
                 totalMasculino++;
             }
             // codigo Feminino
-            if(candidato.getGenero() == 4){
+            if(candidato.getGenero() == Genero.FEMININO.getGenero()){
                 totalFeminino++;
             }
         }
