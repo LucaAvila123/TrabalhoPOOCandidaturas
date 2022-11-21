@@ -3,6 +3,7 @@ import java.text.*;
 import java.time.*;
 import java.time.temporal.*;
 
+import Enum.DataEleicao;
 import Enum.Eleito;
 
 public class Candidato {
@@ -26,10 +27,10 @@ public class Candidato {
         this.partido = partido;
         this.nomeDeUrna = nomeDeUrna;
         this.dataDeNascimento = dataDeNascimento; 
-        this.codigoDoCargo = codigoDoCargo; // determina se é estadual (7) ou federal (6)
+        this.codigoDoCargo = codigoDoCargo;
         this.numeroDaFederacao = numeroDaFederacao;
         this.numeroDoCandidato = numeroDoCandidato;
-        this.genero = genero; // 2 representa masculino e 4 representa feminino
+        this.genero = genero; 
         this.situacaoDaTotalizacao = situacaoDaTotalizacao;
         
     }
@@ -79,9 +80,6 @@ public class Candidato {
         return totalDeVotos;
     }
 
-    //nao sei classificar essas funcoes
-
-
     //deve retornar a idade do candidato na data indicada em sua construção 
     public int getIdade() throws ParseException{
 
@@ -91,8 +89,8 @@ public class Candidato {
         int mesNascimento = Integer.parseInt(manipulandoData[1]);
         int anoNascimento = Integer.parseInt(manipulandoData[2]);
         LocalDateTime dataCandidato = LocalDateTime.of(anoNascimento, mesNascimento, diaNascimento, 0, 0, 0);
-        // a data da eleição de 2022 foi dia 02/10/2022; talvez seja útil mudar pra ficar integrado com o CSV
-        LocalDateTime hoje = LocalDateTime.of(2022, 10, 2, 0, 0, 0);
+        // a data da eleição de 2022 foi dia 02/10/2022; deixando as constantes em outro arquivo
+        LocalDateTime hoje = LocalDateTime.of(DataEleicao.ANO.getNumero(), DataEleicao.MES.getNumero(), DataEleicao.DIA.getNumero(), 0, 0, 0);
 
         //calcula diferença
         int anos = (int) dataCandidato.until(hoje, ChronoUnit.YEARS);
