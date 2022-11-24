@@ -13,11 +13,6 @@ public class App {
         
         // java -jar deputados.jar --estadual consulta_cand_2022_ES.csv votacao_secao_2022_ES.csv 02/10/2022
         // java -jar deputados.jar --federal consulta_cand_2022_ES.csv votacao_secao_2022_ES.csv 02/10/2022
-        // int i = 0;
-        // for (String string : args) {
-        //     System.out.println(i + " " + string);
-        //     i++;
-        // }
 
         // o termo 0 é referente ao tipo da eleição
         // o termo 1 é o arquivo de candidaturas
