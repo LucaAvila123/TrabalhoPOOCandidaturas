@@ -1,14 +1,20 @@
 package Estaticos;
 
-public enum DataEleicao {
-    ANO(2022), MES(10), DIA(2);
+public class DataEleicao {
+    static private int ano;
+    static private int mes;
+    static private int dia;
 
-    private int indice;
-    DataEleicao(int indice) {
-        this.indice = indice;
+    // o formato da data está sempre setado para dd/mm/yyyy
+    // essa classe precisa ser inicializada para que Candidato possa receber alguma idade
+    public DataEleicao(String data){
+        String[] formataData = data.split("/");
+        dia = Integer.parseInt(formataData[0]);
+        mes = Integer.parseInt(formataData[1]);
+        ano = Integer.parseInt(formataData[2]);
     }
-    
-    public int getNumero(){
-        return indice;
-    }
+
+    public static final int ANO = ano;
+    public static final int MES = mes;
+    public static final int DIA = dia;
 }
