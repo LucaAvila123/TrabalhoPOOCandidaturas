@@ -1,7 +1,7 @@
 import Relatorios.*;
-import java.io.*;
-import Candidaturas.*;
 import Estaticos.*;
+import java.util.*;
+
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -35,59 +35,111 @@ public class App {
             System.out.println("O formato da linha de comando deve ser o feito a seguir");
             System.out.println("java -jar deputados.jar <opção_de_cargo> <caminho_arquivo_candidatos> <caminho_arquivo_votacao> <data>");
         }
-        
+        if(!(tipoEleicao.equals("--estadual") || tipoEleicao.equals("--federal"))){
+            throw new Exception("Coloque --federal ou --estadual no campo <opção_de_cargo>");
+        }
+        System.out.println(arquivoCandidaturas);
         // isso daqui é só para inicializar o dia da votação
-        // só será usado para setar valores a serem usados no objeto Candidato
-        DataEleicao diaVotacao = new DataEleicao(args[3]);
+        // só será usado para setar valoresCandidatos a serem usados no objeto Candidato
+        DataEleicao diaVotacao = new DataEleicao(dataEleicao);
         
         // SEGUNDA PARTE: leitura dos arquivos de candidatos
-        // SistemaEleitoral sistema = new SistemaEleitoral();
-        // int CD_CARGO_index = -1;
-        // int CD_SITUACAO_CANDIDADO_TOT_index = -1;
-        // int NR_CANDIDATO_index = -1;
-        // int NM_URNA_CANDIDATO_index = -1;
-        // int NR_PARTIDO_index = -1;
-        // int SG_PARTIDO_index = -1;
-        // int NR_FEDERACAO_index = -1;
-        // int DT_NASCIMENTO_index = -1;
-        // int CD_SIT_TOT_TURNO_index = -1;
-        // int CD_GENERO_index = -1;
-        // int NM_TIPO_DESTINACAO_VOTOS_index = -1;
-
-        // try {
-        //     BufferedReader buffRead = new BufferedReader(new FileReader("consulta_cand_2-122/consulta_cand_2-122_ES.csv"));
-        //     String linha = "";
-        //     String separando[];
-
-        //     linha = buffRead.readLine();
-        //     // o csv é dividido por ; e tem aspas em volta de todos os elementos
-        //     separando = linha.split(";");
-            
-        //     for(int i = 0; i < separando.length; i++){
-        //         if(separando[i].equals("CD_CARGO")) CD_CARGO_index = i;
-        //         if(separando[i].equals("CD_SITUACAO_CANDIDADO_TOT")) CD_SITUACAO_CANDIDADO_TOT_index = i;
-        //         if(separando[i].equals("NR_CANDIDATO")) NR_CANDIDATO_index = i;
-        //         if(separando[i].equals("NM_URNA_CANDIDATO")) NM_URNA_CANDIDATO_index = i;
-        //         if(separando[i].equals("NR_PARTIDO")) NR_PARTIDO_index = i;
-        //         if(separando[i].equals("SG_PARTIDO")) SG_PARTIDO_index = i;
-        //         if(separando[i].equals("NR_FEDERACAO")) NR_FEDERACAO_index = i;
-        //         if(separando[i].equals("DT_NASCIMENTO")) DT_NASCIMENTO_index = i;
-        //         if(separando[i].equals("CD_SIT_TOT_TURNO")) CD_SIT_TOT_TURNO_index = i;
-        //         if(separando[i].equals("CD_GENERO")) CD_GENERO_index = i;
-        //         if(separando[i].equals("NM_TIPO_DESTINACAO_VOTOS")) NM_TIPO_DESTINACAO_VOTOS_index = i;
-        //     }
-            
-        //     linha = buffRead.readLine();
-        //     while(linha != null){
-        //         separando = linha.split(";");
-
-        //         linha = buffRead.readLine();
-        //     }
-        //     buffRead.close();
-
-        // } catch (Exception e) {
-        //     System.out.println("Arquivo de candidatos não encontrado");
-        // }
+        SistemaEleitoral sistema = new SistemaEleitoral();
+        CsvReader arquivoCandidatos = new CsvReader(arquivoCandidaturas, ";", "UTF-8");
+        CsvReader arquivoVotacoes = new CsvReader(arquivoVotacao, ";", "UTF-8");
+        // vai pegar as colunas específicas do arquivo
+        System.out.println(arquivoCandidaturas != null);
         
+        //lendo arquivo de candidatos:       0               1                               2                   3                       4                   5                   6                   7                   8                       9               10                              
+        String[] valuesCandidatos = {"\"CD_CARGO\"", "\"CD_SITUACAO_CANDIDATO_TOT\"", "\"NR_CANDIDATO\"", "\"NM_URNA_CANDIDATO\"", "\"NR_PARTIDO\"", "\"SG_PARTIDO\"", "\"NR_FEDERACAO\"", "\"DT_NASCIMENTO\"", "\"CD_SIT_TOT_TURNO\"", "\"CD_GENERO\"", "\"NM_TIPO_DESTINACAO_VOTOS\""};
+        List<String> valoresCandidatos = arquivoCandidatos.nextValues(valuesCandidatos);
+        if(valoresCandidatos == null) throw new Exception("Arquivo de candidaturas tem formato inválido");
+
+        String[] valuesVotacoes = {"\"CD_CARGO\"", "\"NR_VOTAVEL\"", "\"QT_VOTOS\""};
+        List<String> valoresVotacoes = arquivoCandidatos.nextValues(valuesVotacoes);
+        if(valoresVotacoes == null) throw new Exception("Arquivo de votacoes tem formato inválido");
+
+        // TODO: resolver o formato de leitura aqui
+        System.out.println(valoresCandidatos.get(IndicesCandidatos.NM_TIPO_DESTINACAO_VOTOS.num()));
+        System.out.println(valoresCandidatos.get(IndicesCandidatos.NM_TIPO_DESTINACAO_VOTOS.num()).equals("\"V�lido\""));
+        System.out.println(valoresCandidatos.get(IndicesCandidatos.NM_TIPO_DESTINACAO_VOTOS.num()).equals("\"Válido\""));
+        
+        // TODO: verificar a NoSuchElementException usada
+        do{
+            if(tipoEleicao.equals("--estadual")){
+                // voltando ao começo do loop se não houver valoresCandidatos coincidentes
+                if(!(Integer.parseInt(valoresCandidatos.get(IndicesCandidatos.CD_CARGO.num()).replaceAll("\"", "")) == CodigoCargo.ESTADUAL.getCodigoCargo())){
+                    valoresCandidatos = arquivoCandidatos.nextValues(valuesCandidatos);
+                    continue;
+                }
+            }
+            else if(tipoEleicao.equals("--federal")){
+                if(!(Integer.parseInt(valoresCandidatos.get(IndicesCandidatos.CD_CARGO.num()).replaceAll("\"", "")) == CodigoCargo.FEDERAL.getCodigoCargo())){
+                    valoresCandidatos = arquivoCandidatos.nextValues(valuesCandidatos);
+                    continue;
+                }
+            }
+            
+            int numeroPartido = Integer.parseInt(valoresCandidatos.get(IndicesCandidatos.NR_PARTIDO.num()).replaceAll("\"", ""));
+            String siglaPartido = valoresCandidatos.get(IndicesCandidatos.SG_PARTIDO.num()).replaceAll("\"", "");
+            sistema.cadastraPartido(numeroPartido, siglaPartido);
+            
+            String nomeDeUrna = valoresCandidatos.get(IndicesCandidatos.NM_URNA_CANDIDATO.num()).replaceAll("\"", "");
+            String dataDeNascimento = valoresCandidatos.get(IndicesCandidatos.DT_NASCIMENTO.num()).replaceAll("\"", "");
+            int codigoDoCargo = Integer.parseInt(valoresCandidatos.get(IndicesCandidatos.CD_CARGO.num()).replaceAll("\"", ""));
+            int numeroDaFederacao = Integer.parseInt(valoresCandidatos.get(IndicesCandidatos.NR_FEDERACAO.num()).replaceAll("\"", ""));
+            int numeroDoCandidato = Integer.parseInt(valoresCandidatos.get(IndicesCandidatos.NR_CANDIDATO.num()).replaceAll("\"", ""));
+            int genero = Integer.parseInt(valoresCandidatos.get(IndicesCandidatos.CD_GENERO.num()).replaceAll("\"", ""));
+            // verificando se foi eleito
+            int situacaoDaTotalizacao = Integer.parseInt(valoresCandidatos.get(IndicesCandidatos.CD_SIT_TOT_TURNO.num()).replaceAll("\"", ""));
+            int deferido = Integer.parseInt(valoresCandidatos.get(IndicesCandidatos.CD_SITUACAO_CANDIDATO_TOT.num()).replaceAll("\"", ""));
+            String destinoVotos = valoresCandidatos.get(IndicesCandidatos.NM_TIPO_DESTINACAO_VOTOS.num()).replaceAll("\"", "");
+            sistema.cadastraCandidato(numeroPartido, nomeDeUrna, dataDeNascimento, codigoDoCargo, numeroDaFederacao, numeroDoCandidato, genero, situacaoDaTotalizacao, deferido, destinoVotos);
+            
+            valoresCandidatos = arquivoCandidatos.nextValues(valuesCandidatos);
+            
+        }while(valoresCandidatos != null);
+
+        do{
+            if(tipoEleicao.equals("--estadual")){
+                // voltando ao começo do loop se não houver valoresCandidatos coincidentes
+                if(!(Integer.parseInt(valoresVotacoes.get(IndicesVotacoes.CD_CARGO.num()).replaceAll("\"", "")) == CodigoCargo.ESTADUAL.getCodigoCargo())){
+                    valoresVotacoes = arquivoVotacoes.nextValues(valuesVotacoes);
+                    continue;
+                }
+            }
+            else if(tipoEleicao.equals("--federal")){
+                if(!(Integer.parseInt(valoresVotacoes.get(IndicesVotacoes.CD_CARGO.num()).replaceAll("\"", "")) == CodigoCargo.FEDERAL.getCodigoCargo())){
+                    valoresVotacoes = arquivoVotacoes.nextValues(valuesVotacoes);
+                    continue;
+                }
+            }
+            int numeroVotavel = Integer.parseInt(valoresVotacoes.get(IndicesVotacoes.NR_VOTAVEL.num()).replaceAll("\"", ""));
+            if(VotosInvalidos.ignorarNumero(numeroVotavel)){
+                valoresVotacoes = arquivoVotacoes.nextValues(valuesVotacoes);
+                continue;
+            }
+            int qtd_votos = Integer.parseInt(valoresVotacoes.get(IndicesVotacoes.QT_VOTOS.num()).replaceAll("\"", ""));
+            
+            // essa função joga os votos para legenda ou nominais
+            sistema.declaraVotos(numeroVotavel, qtd_votos);
+            
+            valoresVotacoes = arquivoVotacoes.nextValues(valuesVotacoes);
+        }while(valoresVotacoes != null);
+
+        sistema.reordenaTodasListas();
+
+        Relatorio relatorioFinal = new Relatorio(sistema, tipoEleicao);
+        
+        relatorioFinal.primeiro();
+        relatorioFinal.segundo();
+        relatorioFinal.terceiro();
+        relatorioFinal.quarto();
+        relatorioFinal.quinto();
+        relatorioFinal.sexto();
+        relatorioFinal.oitavo();
+        relatorioFinal.nono();
+        relatorioFinal.decimo();
+        relatorioFinal.decimoPrimeiro();
     }   
 }

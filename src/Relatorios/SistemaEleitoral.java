@@ -13,7 +13,6 @@ public class SistemaEleitoral {
     // enquanto a tabela é usada para calcular os valores, a lista para ordenar a quantidade de votos total
     private List<Candidato> CandidatosMaisVotados;
 
-    // acho que essa lista aqui é dispensável, é bom repensar
     private List<Partido> PartidosVotados;
 
     // número de votos (válidos, nominais e de legenda)
@@ -61,36 +60,44 @@ public class SistemaEleitoral {
     }
 
     //serve para inserir um candidato no sistema e nas listas
-    public void cadastraCandidato(Candidato candidato){
-        if(CandidatosParticipantes.containsKey(candidato.getNumeroDoCandidato()) == false){
+    public void cadastraCandidato(int numeroPartido, String nomeDeUrna, String dataDeNascimento, int codigoDoCargo,
+        int numeroDaFederacao, int numeroDoCandidato, int genero, int situacaoDaTotalizacao, int deferido,
+        String destinoVotos){
+        if(CandidatosParticipantes.containsKey(numeroDoCandidato) == false){
             // essa hash map usa o número do candidato para busca
-            CandidatosParticipantes.put(candidato.getNumeroDoCandidato(), candidato);
+            CandidatosParticipantes.put(numeroDoCandidato, new Candidato(PartidosParticipantes.get(numeroPartido), 
+                                                            nomeDeUrna, dataDeNascimento, codigoDoCargo, numeroDaFederacao,
+                                                            numeroDoCandidato, genero, situacaoDaTotalizacao, deferido,
+                                                            destinoVotos));
             // essa lista precisa ser reordenada para bom funcionamento posterior
-            CandidatosMaisVotados.add(candidato);
+            CandidatosMaisVotados.add(CandidatosParticipantes.get(numeroDoCandidato));
             
-            // se o partido ainda não está na tabela
-            if(PartidosParticipantes.containsKey(candidato.getPartido().getNumeroDoPartido()) == false){
-                PartidosParticipantes.put(candidato.getPartido().getNumeroDoPartido(), candidato.getPartido());
-            }
-
-            candidato.getPartido().adicionaCandidato(candidato);
+            PartidosParticipantes.get(numeroPartido).adicionaCandidato(CandidatosParticipantes.get(numeroDoCandidato));
         }
     }
 
     // serve para cadastrar um partido no sistema
-    // não acredito que seja necessário porque os votos de legenda precisam de alguma candidatura para serem contabilizados
-    /*public void cadastraPartido(Partido partido){
-        PartidosParticipantes.put(partido.getNumeroDoPartido(), partido);
-    }*/
+    // o cadastro dos partidos é pra acontecer antes do dos candidatos
+    public void cadastraPartido(int numeroPartido, String siglaPartido){
+        if(PartidosParticipantes.containsKey(numeroPartido) == false){
+            PartidosParticipantes.put(numeroPartido, new Partido(numeroPartido, siglaPartido));
+            PartidosVotados.add(PartidosParticipantes.get(numeroPartido));
+        }
+    }
 
     // procura na tabela hash de candidatos o candidato e incrementa o número de votos colocados
     // acredito que a versão anterior do trabalho estava dando problema por usar isso para os votos de legenda
     public void declararVotosNominais(int numeroDoCandidato, int numeroDeVotos){
         if(CandidatosParticipantes.containsKey(numeroDoCandidato) == true){
-            CandidatosParticipantes.get(numeroDoCandidato).adicionarVotos(numeroDeVotos);
-            
+            Candidato candidato = CandidatosParticipantes.get(numeroDoCandidato);
+            candidato.adicionarVotos(numeroDeVotos);
             // somando os votos de cada candidato assim
-            totalDeVotosNominais += numeroDeVotos;
+            if(candidato.destinoVotosLegenda() == true){
+                totalDeVotosDeLegenda += numeroDeVotos;
+            }
+            else{
+                totalDeVotosNominais += numeroDeVotos;
+            }
         } 
     }
 
@@ -104,7 +111,17 @@ public class SistemaEleitoral {
             totalDeVotosDeLegenda += numeroDeVotos;
         }
     }
-
+    
+    // escolhe se o voto vai ser de legenda ou não
+    public void declaraVotos(int numeroVotavel, int numeroDeVotos){
+        if(PartidosParticipantes.containsKey(numeroVotavel) == true){
+            declaraVotosDeLegenda(numeroVotavel, numeroDeVotos);
+        }
+        else{
+            declararVotosNominais(numeroVotavel, numeroDeVotos);
+        }
+    }
+    
     // cada candidato declarado e cada voto de legenda declarado já está sendo contabilizado
     // talvez esteja evitando acessar a estrutura de dados
     public void calculaVotosTotais(){

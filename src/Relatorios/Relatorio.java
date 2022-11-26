@@ -25,21 +25,21 @@ public class Relatorio {
     
 
     // Relatorio 1: imprime o número de vagas
-    public void imprimeNumeroVagas(){
+    public void primeiro(){
         System.out.println("Número de vagas: " + sistema.getNumeroVagas());
     }
 
     // Relatorio 2: imprime os candidatos eleitos
-    public void imprimeCandidatosEleitos(){
-        if(modo.equals("federal")){
+    public void segundo(){
+        if(modo.equals("--federal")){
             System.out.println("Deputados federais eleitos:");
         }
-        if(modo.equals("estadual")){
+        if(modo.equals("--estadual")){
             System.out.println("Deputados estaduais eleitos");
         }
 
         int i = 0;
-        ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
+        List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
           
         for (Candidato candidato : candidatosMaisVotados) {
             if(candidato.foiEleito() == true){
@@ -56,9 +56,9 @@ public class Relatorio {
     }
 
     // Relatorio 3: imprime candidatos mais votados respeitando número de vagas
-    public void imprimeCandidatosMaisVotados(){
+    public void terceiro(){
         // irei supor aqui que os relatórios só serão feitos depois de a lista de candidatos já ter sido ordenada
-        ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
+        List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         
         // esse formato tinha dado problema antes por algum motivo na hora de contabilizar
         for(int i = 0; i < sistema.getNumeroVagas(); i++){
@@ -71,12 +71,12 @@ public class Relatorio {
     }
 
     // Relatorio 4: candidatos prejudicados pelo sistema proporcional
-    public void imprimeCandidatosBemVotadosNaoEleitos(){
+    public void quarto(){
         
         System.out.println("Teriam sido eleitos se a votação fosse majoritária, e não foram eleitos:");
         System.out.println("(com sua posição no ranking de mais votados)");
 
-        ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
+        List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         Candidato candidato;
 
         for(int i = 0; i < sistema.getNumeroVagas(); i++){
@@ -91,11 +91,11 @@ public class Relatorio {
     }
     
     // Relatorio 5: candidatos beneficiados pelo sistema proporcional
-    public void imprimeCandidatosMalVotadosEleitos(){
+    public void quinto(){
         System.out.println("Eleitos, que se beneficiaram do sistema proporcional:");
         System.out.println("com sua posição no ranking de mais votados)");
 
-        ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
+        List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         Candidato candidato;
         
         // vai imprimir pra valores de i acima do número de vagas e até o número de eleitos ter o número de vagas
@@ -114,8 +114,8 @@ public class Relatorio {
         
     }
     // Relatorio 6: votos totalizados por partido e número de candidatos eleitos
-    public void imprimeVotacaoDosPartidos(){
-        ArrayList <Partido> partidosVotados = sistema.CopiaPartidosVotados();
+    public void sexto(){
+        List <Partido> partidosVotados = sistema.CopiaPartidosVotados();
         int i = 0;
         for (Partido partido : partidosVotados) {
             i++;
@@ -126,11 +126,11 @@ public class Relatorio {
     // Relatorio 7: IGNORADO, por ordens do professor
 
     // Relatorio 8: primeiro e último colocados de cada partido
-    public void imprimePrimeiro_eUltimo(){
+    public void oitavo(){
         // lógica aqui: a ordem depende do candidato mais votado do partido
         // criando uma nova lista de partidos a partir do candidato mais votado (e só dele)
-        ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
-        ArrayList<Partido> partidosTotal = new ArrayList<>();
+        List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
+        List<Partido> partidosTotal = new ArrayList<>();
         
         for (Candidato candidato : candidatosMaisVotados) {
             // vai ignorar partidos que não tenham número positivo de votos
@@ -171,9 +171,9 @@ public class Relatorio {
     }
     
     // Relatorio 9: faixas etarias
-    public void imprimeFaixasEtarias() throws ParseException{
+    public void nono() throws ParseException{
 
-        ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
+        List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         int menoresDe30 = 0;
         int de30a40 = 0;
         int de40a50 = 0;
@@ -208,8 +208,8 @@ public class Relatorio {
     }
     
     // Relatorio 10: eleitos por gênero
-    public void imprimeGeneros(){
-        ArrayList<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
+    public void decimo(){
+        List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         int totalFeminino = 0;
         int totalMasculino = 0;
 
@@ -230,7 +230,7 @@ public class Relatorio {
     }
     
     // Relatório 11: Total de votos válidos, total de votos nominais e total de votos de legenda
-    public void imprimeTotalDeVotosDeCadaTipo(){
+    public void decimoPrimeiro(){
         System.out.println("Total de votos válidos:      " + sistema.getTotalDeVotosValidos());
         System.out.printf("Total de votos nominais:     %d (%.2f%)\n", sistema.getTotalVotosNominais(), (float) 100*sistema.getTotalVotosNominais()/sistema.getTotalDeVotosValidos());
         System.out.printf("Total de votos de legenda:   %d (%.2f%)\n", sistema.getTotalVotosLegenda() , (float) 100*sistema.getTotalVotosLegenda()/sistema.getTotalDeVotosValidos());
