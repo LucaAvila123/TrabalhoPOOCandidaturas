@@ -2,7 +2,9 @@ package Candidaturas;
 
 import java.util.*;
 
-import Relatorios.SistemaEleitoral;
+import Relatorios.*;
+
+// import Relatorios.SistemaEleitoral;
 
 public class Partido {
     private int numeroDoPartido;
@@ -94,5 +96,12 @@ public class Partido {
         }
 
         return quantosEleitos;
+    }
+
+    public void imprimeCandidatos(){
+        System.out.println(this.getSigla() + ":");
+        for (Candidato candidato : candidatosPartido) {
+            System.out.println(candidato.getNomeDeUrna());
+        }
     }
 }

@@ -21,10 +21,15 @@ public class App {
 
         // decidindo se serão lidos apenas federal ou estadual
         // a string será ou "--federal" ou "--estadual"
+        
         String tipoEleicao = null;
         String arquivoCandidaturas = null;
         String arquivoVotacao = null;
         String dataEleicao = null;
+
+        //MODIFICACAO coloquei um enum aqui
+        CodigoCargo cargoAtual;
+
         try{
             tipoEleicao = args[0];
             arquivoCandidaturas = args[1];
@@ -35,36 +40,138 @@ public class App {
             System.out.println("O formato da linha de comando deve ser o feito a seguir");
             System.out.println("java -jar deputados.jar <opção_de_cargo> <caminho_arquivo_candidatos> <caminho_arquivo_votacao> <data>");
         }
-        if(!(tipoEleicao.equals("--estadual") || tipoEleicao.equals("--federal"))){
-            throw new Exception("Coloque --federal ou --estadual no campo <opção_de_cargo>");
+
+        //salvando o cargo atual do programa
+        if(tipoEleicao.equals("--estadual")){
+            cargoAtual = CodigoCargo.ESTADUAL;
+        }else if (tipoEleicao.equals("--federal")){
+            cargoAtual = CodigoCargo.FEDERAL;
+        }else{
+            //MODIFICACAO: RUNTIME EXCEPTION AQUI....
+            throw new RuntimeException("Coloque --federal ou --estadual no campo <opção_de_cargo>");
         }
-        System.out.println(arquivoCandidaturas);
+        
         // isso daqui é só para inicializar o dia da votação
         // só será usado para setar valoresCandidatos a serem usados no objeto Candidato
         DataEleicao diaVotacao = new DataEleicao(dataEleicao);
         
         // SEGUNDA PARTE: leitura dos arquivos de candidatos
+
+        //instanciando o sistema eleitoral
         SistemaEleitoral sistema = new SistemaEleitoral();
-        CsvReader arquivoCandidatos = new CsvReader(arquivoCandidaturas, ";", "UTF-8");
-        CsvReader arquivoVotacoes = new CsvReader(arquivoVotacao, ";", "UTF-8");
-        // vai pegar as colunas específicas do arquivo
-        System.out.println(arquivoCandidaturas != null);
+
+        //Gerenciadoes das linhas do arquivo
+        CsvReader arquivoCandidatos = new CsvReader(arquivoCandidaturas, ";", "ISO-8859-1", true);
+        CsvReader arquivoVotacoes = new CsvReader(arquivoVotacao, ";", "ISO-8859-1", true);
         
-        //lendo arquivo de candidatos:       0               1                               2                   3                       4                   5                   6                   7                   8                       9               10                              
-        String[] valuesCandidatos = {"\"CD_CARGO\"", "\"CD_SITUACAO_CANDIDATO_TOT\"", "\"NR_CANDIDATO\"", "\"NM_URNA_CANDIDATO\"", "\"NR_PARTIDO\"", "\"SG_PARTIDO\"", "\"NR_FEDERACAO\"", "\"DT_NASCIMENTO\"", "\"CD_SIT_TOT_TURNO\"", "\"CD_GENERO\"", "\"NM_TIPO_DESTINACAO_VOTOS\""};
-        List<String> valoresCandidatos = arquivoCandidatos.nextValues(valuesCandidatos);
-        if(valoresCandidatos == null) throw new Exception("Arquivo de candidaturas tem formato inválido");
+        //valores que serao selecionados do arquivo
+        String[] valuesCandidatos = {
+            /*0*/"CD_CARGO", 
+            /*1*/"CD_SITUACAO_CANDIDATO_TOT", 
+            /*2*/"NR_CANDIDATO", 
+            /*3*/"NM_URNA_CANDIDATO", 
+            /*4*/"NR_PARTIDO", 
+            /*5*/"SG_PARTIDO", 
+            /*6*/"NR_FEDERACAO", 
+            /*7*/"DT_NASCIMENTO", 
+            /*8*/"CD_SIT_TOT_TURNO", 
+            /*9*/"CD_GENERO", 
+            /*10*/"NM_TIPO_DESTINACAO_VOTOS"
+        };
+        //adiciona aspas para cada elemento
+        quote(valuesCandidatos);
 
-        String[] valuesVotacoes = {"\"CD_CARGO\"", "\"NR_VOTAVEL\"", "\"QT_VOTOS\""};
-        List<String> valoresVotacoes = arquivoCandidatos.nextValues(valuesVotacoes);
-        if(valoresVotacoes == null) throw new Exception("Arquivo de votacoes tem formato inválido");
+        String[] valuesVotacoes = {
+            /*0*/"CD_CARGO", 
+            /*1*/"NR_VOTAVEL", 
+            /*2*/"QT_VOTOS"
+        };
+        //adiciona aspas para cada elemento
+        quote(valuesVotacoes);
 
-        // TODO: resolver o formato de leitura aqui
+
+        //inicializar os candidatos
+        while(arquivoCandidatos.hasNextValues()){
+
+            //passando para array pra ficar mais facil e tirando as aspas dos valores
+            List<String> valoresCandidatos = arquivoCandidatos.nextValues(valuesCandidatos);
+            //dados do partido
+            int numeroPartido = Integer.parseInt(unquote(valoresCandidatos.get(4)));
+            String siglaPartido = unquote(valoresCandidatos.get(5));
+            
+            //cadastrando no sistema    
+            // essa função precisa ficar aqui pro caso de partidos com 0 votos
+            if(sistema.getPartido(numeroPartido) == null){
+                sistema.cadastraPartido(numeroPartido, siglaPartido);
+            }
+            //dados do candidato
+            String nomeDeUrna = unquote(valoresCandidatos.get(3));
+            String dataDeNascimento = unquote(valoresCandidatos.get(7));
+            int codigoDoCargo = Integer.parseInt(unquote(valoresCandidatos.get(0)));
+            int numeroDaFederacao = Integer.parseInt(unquote(valoresCandidatos.get(6)));
+            int numeroDoCandidato = Integer.parseInt(unquote(valoresCandidatos.get(2)));
+            int genero = Integer.parseInt(unquote(valoresCandidatos.get(9)));
+
+            // verificando se foi eleito
+            int situacaoDaTotalizacao = Integer.parseInt(unquote(valoresCandidatos.get(8)));
+            int deferido = Integer.parseInt(unquote(valoresCandidatos.get(1)));
+            String destinoVotos = unquote(valoresCandidatos.get(10));
+            
+            // voltando ao começo do loop se não houver valoresCandidatos coincidentes
+            if(codigoDoCargo != cargoAtual.getCodigoCargo()) continue;
+
+            
+            // System.out.println(valoresCandidatos);
+            sistema.cadastraCandidato(numeroPartido, nomeDeUrna, dataDeNascimento, codigoDoCargo, numeroDaFederacao, numeroDoCandidato, genero, situacaoDaTotalizacao, deferido, destinoVotos, diaVotacao);
+            
+        }
+
+        //contabilisar os votos
+        while(arquivoVotacoes.hasNextValues()){
+            List<String> valoresVotacoes = arquivoVotacoes.nextValues(valuesVotacoes);
+            
+            int numeroVotavel = Integer.parseInt(unquote(valoresVotacoes.get(1)));
+            int qtd_votos = Integer.parseInt(unquote(valoresVotacoes.get(2)));
+            int codigoDoCargo = Integer.parseInt(unquote(valoresVotacoes.get(0)));
+
+            // voltando ao começo do loop se não houver valoresCandidatos coincidentes
+            if(codigoDoCargo != cargoAtual.getCodigoCargo()) continue;
+
+            //validando votos
+            if(VotosInvalidos.ignorarNumero(numeroVotavel)){
+                valoresVotacoes = arquivoVotacoes.nextValues(valuesVotacoes);
+                continue;
+            }
+
+            //declarando votos
+            sistema.declaraVotos(numeroVotavel, qtd_votos);
+        }
+
+        sistema.reordenaTodasListas();
+        
+        Relatorio relatorioFinal = new Relatorio(sistema, tipoEleicao);
+    
+        relatorioFinal.primeiro();
+        relatorioFinal.segundo();
+        relatorioFinal.terceiro();
+        relatorioFinal.quarto();
+        relatorioFinal.quinto();
+        relatorioFinal.sexto();
+        relatorioFinal.oitavo();
+        relatorioFinal.nono();
+        relatorioFinal.decimo();
+        relatorioFinal.decimoPrimeiro();
+
+        //*****************************************************/
+        //******MANTIVE O RESTO COMENTADO CASO DE MERDA*******/
+        //****************************************************/
+
+        /*
         System.out.println(valoresCandidatos.get(IndicesCandidatos.NM_TIPO_DESTINACAO_VOTOS.num()));
         System.out.println(valoresCandidatos.get(IndicesCandidatos.NM_TIPO_DESTINACAO_VOTOS.num()).equals("\"V�lido\""));
         System.out.println(valoresCandidatos.get(IndicesCandidatos.NM_TIPO_DESTINACAO_VOTOS.num()).equals("\"Válido\""));
         
-        // TODO: verificar a NoSuchElementException usada
+        
         do{
             if(tipoEleicao.equals("--estadual")){
                 // voltando ao começo do loop se não houver valoresCandidatos coincidentes
@@ -114,6 +221,7 @@ public class App {
                     continue;
                 }
             }
+
             int numeroVotavel = Integer.parseInt(valoresVotacoes.get(IndicesVotacoes.NR_VOTAVEL.num()).replaceAll("\"", ""));
             if(VotosInvalidos.ignorarNumero(numeroVotavel)){
                 valoresVotacoes = arquivoVotacoes.nextValues(valuesVotacoes);
@@ -141,5 +249,34 @@ public class App {
         relatorioFinal.nono();
         relatorioFinal.decimo();
         relatorioFinal.decimoPrimeiro();
-    }   
+    */
+    }
+
+    //--------FUNCOES QUE SAO BEM UTEIS PARA O PROGRAMA-----------//
+	//Coloca a string entre aspas duplas
+	private static String quote(String stringToBeQuoted){
+		return "\"" + stringToBeQuoted + "\"";
+	}
+
+
+	//Retira aspas duplas da string
+	//se nao existem aspas em um dos lados retorna a propria string 
+	private static String unquote(String stringToBeUnquoted){
+		if(stringToBeUnquoted.endsWith("\"") && stringToBeUnquoted.startsWith("\"")){
+			return stringToBeUnquoted.substring(1, stringToBeUnquoted.length() - 1);
+		}else
+		return stringToBeUnquoted;
+	}
+	
+	private static void quote(String[] stringsToBeQuoted){
+		for(int i = 0; i < stringsToBeQuoted.length; i++){
+			stringsToBeQuoted[i] = quote(stringsToBeQuoted[i]);
+		}
+	}
+
+    private static void unquote(String[] stringsToBeQuoted){
+		for(int i = 0; i < stringsToBeQuoted.length; i++){
+			stringsToBeQuoted[i] = unquote(stringsToBeQuoted[i]);
+		}
+	}
 }

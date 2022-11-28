@@ -2,6 +2,7 @@ package Relatorios;
 import java.util.*;
 
 import Candidaturas.*;
+import Estaticos.*;
 
 public class SistemaEleitoral {
     
@@ -62,26 +63,32 @@ public class SistemaEleitoral {
     //serve para inserir um candidato no sistema e nas listas
     public void cadastraCandidato(int numeroPartido, String nomeDeUrna, String dataDeNascimento, int codigoDoCargo,
         int numeroDaFederacao, int numeroDoCandidato, int genero, int situacaoDaTotalizacao, int deferido,
-        String destinoVotos){
+        String destinoVotos, DataEleicao dataEleicao){
+
         if(CandidatosParticipantes.containsKey(numeroDoCandidato) == false){
+            Partido partidoDoCandidato = PartidosParticipantes.get(numeroPartido);
+            Candidato candidato = new Candidato(partidoDoCandidato, nomeDeUrna, dataDeNascimento, 
+                codigoDoCargo, numeroDaFederacao,
+                numeroDoCandidato, genero, situacaoDaTotalizacao, deferido,
+                destinoVotos, dataEleicao);
             // essa hash map usa o número do candidato para busca
-            CandidatosParticipantes.put(numeroDoCandidato, new Candidato(PartidosParticipantes.get(numeroPartido), 
-                                                            nomeDeUrna, dataDeNascimento, codigoDoCargo, numeroDaFederacao,
-                                                            numeroDoCandidato, genero, situacaoDaTotalizacao, deferido,
-                                                            destinoVotos));
+            CandidatosParticipantes.put(numeroDoCandidato, candidato); 
+                                                            
             // essa lista precisa ser reordenada para bom funcionamento posterior
-            CandidatosMaisVotados.add(CandidatosParticipantes.get(numeroDoCandidato));
-            
-            PartidosParticipantes.get(numeroPartido).adicionaCandidato(CandidatosParticipantes.get(numeroDoCandidato));
+            CandidatosMaisVotados.add(candidato);
+
+            // insere o candidato na lista de candidatos do partido dele
+            partidoDoCandidato.adicionaCandidato(candidato);
         }
-    }
+}
 
     // serve para cadastrar um partido no sistema
     // o cadastro dos partidos é pra acontecer antes do dos candidatos
     public void cadastraPartido(int numeroPartido, String siglaPartido){
         if(PartidosParticipantes.containsKey(numeroPartido) == false){
-            PartidosParticipantes.put(numeroPartido, new Partido(numeroPartido, siglaPartido));
-            PartidosVotados.add(PartidosParticipantes.get(numeroPartido));
+            Partido partido = new Partido(numeroPartido, siglaPartido);
+            PartidosParticipantes.put(numeroPartido, partido);
+            PartidosVotados.add(partido);
         }
     }
 
@@ -106,10 +113,9 @@ public class SistemaEleitoral {
         if(PartidosParticipantes.containsKey(numeroPartido) == true){
             PartidosParticipantes.get(numeroPartido).adicionarVotosDeLegenda(numeroDeVotos);
 
-            // somando os votos de legenda assim
-            // daria para acessar a lista e assim calcular o total de votos
             totalDeVotosDeLegenda += numeroDeVotos;
         }
+        
     }
     
     // escolhe se o voto vai ser de legenda ou não
@@ -118,6 +124,9 @@ public class SistemaEleitoral {
             declaraVotosDeLegenda(numeroVotavel, numeroDeVotos);
         }
         else{
+            if(CandidatosParticipantes.get(numeroVotavel).destinoVotosLegenda()){
+                declaraVotosDeLegenda(CandidatosParticipantes.get(numeroVotavel).getPartido().getNumeroDoPartido(), numeroDeVotos);
+            }
             declararVotosNominais(numeroVotavel, numeroDeVotos);
         }
     }
@@ -136,13 +145,18 @@ public class SistemaEleitoral {
 
     // reordena cada lista de candidato de partido e a lista de candidatos mais votados
     public void reordenaTodasListas(){
+        
         for (Partido partido : PartidosVotados) {
             partido.reordenaListaNoPartido();
+            // partido.imprimeCandidatos();
+            // atualizando dados dos partidos no foreach
+            partido.calculaTotalVotosPartido();
         }
         SistemaEleitoral.reordenaLista(CandidatosMaisVotados);
-
+        
         // não precisa ser criada uma função específica para reordenar a lista de partidos
-        Collections.sort(PartidosVotados, new MaisVotosPartido());
+        Collections.sort(PartidosVotados, new MaisVotosPartido());     
+        this.calculaVotosTotais();
     }
 
     // calcula o número de vagas da eleicao
@@ -154,6 +168,12 @@ public class SistemaEleitoral {
         }
 
         numeroDeVagas = i;
+    }
+
+    public void imprimeCandidatos(){
+        for (Candidato candidato : CandidatosMaisVotados) {
+            System.out.println(candidato.getNomeDeUrna());
+        }
     }
 
     

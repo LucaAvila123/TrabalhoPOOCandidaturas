@@ -20,13 +20,13 @@ public class Candidato {
     private int deferido;
     private int situacaoDaTotalizacao; // define se o candidato foi eleito 
     private String destinoVotos; // fala se o candidato dá votos de legenda
-
+    private DataEleicao dataEleicao;
     private int totalDeVotos = 0; //valor default
     
     //Construtor
     public Candidato(Partido partido, String nomeDeUrna, String dataDeNascimento, int codigoDoCargo,
             int numeroDaFederacao, int numeroDoCandidato, int genero, int situacaoDaTotalizacao, int deferido,
-            String destinoVotos) {
+            String destinoVotos, DataEleicao dataEleicao) {
         this.partido = partido;
         this.nomeDeUrna = nomeDeUrna;
         this.dataDeNascimento = dataDeNascimento; 
@@ -37,7 +37,7 @@ public class Candidato {
         this.situacaoDaTotalizacao = situacaoDaTotalizacao;
         this.deferido = deferido;
         this.destinoVotos = destinoVotos;
-        
+        this.dataEleicao = dataEleicao;
     }
 
     //Getters
@@ -103,8 +103,8 @@ public class Candidato {
         int anoNascimento = Integer.parseInt(manipulandoData[2]);
         LocalDateTime dataCandidato = LocalDateTime.of(anoNascimento, mesNascimento, diaNascimento, 0, 0, 0);
         // a data da eleição de 2022 foi dia 02/10/2022; deixando as constantes em outro arquivo
-        LocalDateTime diaEleicao = LocalDateTime.of(DataEleicao.ANO, DataEleicao.MES, DataEleicao.DIA, 0, 0, 0);
-
+        LocalDateTime diaEleicao = LocalDateTime.of(dataEleicao.ANO, dataEleicao.MES, dataEleicao.DIA, 0, 0, 0);
+        
         //calcula diferença
         int anos = (int) dataCandidato.until(diaEleicao, ChronoUnit.YEARS);
         return anos;

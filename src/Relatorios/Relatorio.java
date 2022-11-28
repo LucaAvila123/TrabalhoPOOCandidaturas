@@ -19,14 +19,24 @@ public class Relatorio {
     public Relatorio(SistemaEleitoral sistema, String modo){
         this.localeBR = new Locale("pt", "BR");
         this.nf = NumberFormat.getInstance(this.localeBR);
+        this.nf.setMaximumFractionDigits(2);
         this.sistema = sistema;
         this.modo = modo;
     }
     
+    public void imprimeCadastrados(SistemaEleitoral sistema){
+        List<Candidato> candidatos = sistema.CopiaCandidatosMaisVotados();
+        for (Candidato candidato : candidatos) {
+            System.out.format(localeBR, candidato.toString() + "\n");
+            
+        }
+    }
 
     // Relatorio 1: imprime o número de vagas
     public void primeiro(){
+        sistema.calculaQuantidadeEleitos();
         System.out.println("Número de vagas: " + sistema.getNumeroVagas());
+        System.out.print("\n");
     }
 
     // Relatorio 2: imprime os candidatos eleitos
@@ -35,23 +45,28 @@ public class Relatorio {
             System.out.println("Deputados federais eleitos:");
         }
         if(modo.equals("--estadual")){
-            System.out.println("Deputados estaduais eleitos");
+            System.out.println("Deputados estaduais eleitos:");
         }
 
         int i = 0;
         List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
-          
+        String impressao;
         for (Candidato candidato : candidatosMaisVotados) {
             if(candidato.foiEleito() == true){
                 i++;
                 // verificando se o candidato participa de federação
+                impressao = i + " - ";
+
                 if(candidato.ehDeFederacao() == true){
-                    System.out.print("*");
+                    impressao += "*";
                 }
-                System.out.println(i + " - " + candidato.getNomeDeUrna() + " (" + candidato.getPartido() + ", " + this.nf.format(candidato.getTotalDeVotos()) + " votos)");
+
+                impressao += candidato.getNomeDeUrna() + " (" + candidato.getPartido().getSigla() + ", " + this.nf.format(candidato.getTotalDeVotos()) + " votos)";
+                System.out.println(impressao);
             }
         }
 
+        System.out.print("\n");
         
     }
 
@@ -60,14 +75,20 @@ public class Relatorio {
         // irei supor aqui que os relatórios só serão feitos depois de a lista de candidatos já ter sido ordenada
         List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         
+        String impressao;
         // esse formato tinha dado problema antes por algum motivo na hora de contabilizar
         for(int i = 0; i < sistema.getNumeroVagas(); i++){
             Candidato candidato = candidatosMaisVotados.get(i);
+            impressao = (i+1) + " - ";
+            
             if(candidato.ehDeFederacao() == true){
-                System.out.print("*");
+                impressao += "*";
             }
-            System.out.println((i+1) + candidato.getNomeDeUrna() + " (" + candidato.getPartido() + ", " + this.nf.format(candidato.getTotalDeVotos()) + " votos)");
+            impressao += candidato.getNomeDeUrna() + " (" + candidato.getPartido().getSigla() + ", " + this.nf.format(candidato.getTotalDeVotos()) + " votos)";
+            System.out.println(impressao);
         }
+
+        System.out.print("\n");
     }
 
     // Relatorio 4: candidatos prejudicados pelo sistema proporcional
@@ -76,24 +97,32 @@ public class Relatorio {
         System.out.println("Teriam sido eleitos se a votação fosse majoritária, e não foram eleitos:");
         System.out.println("(com sua posição no ranking de mais votados)");
 
+        String impressao;
+
         List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         Candidato candidato;
 
         for(int i = 0; i < sistema.getNumeroVagas(); i++){
             candidato = candidatosMaisVotados.get(i);
             if(candidato.foiEleito() == false){
+                impressao = (i+1) + " - ";
                 if(candidato.ehDeFederacao() == true)
-                    System.out.println("*");
+                    impressao += "*";
                 
-                System.out.println((i+1) + candidato.getNomeDeUrna() + " (" + candidato.getPartido() + ", " + this.nf.format(candidato.getTotalDeVotos()) + " votos)");
+                impressao += candidato.getNomeDeUrna() + " (" + candidato.getPartido().getSigla() + ", " + this.nf.format(candidato.getTotalDeVotos()) + " votos)";
+                System.out.println(impressao);
             }
         }
+
+        System.out.print("\n");
     }
     
     // Relatorio 5: candidatos beneficiados pelo sistema proporcional
     public void quinto(){
         System.out.println("Eleitos, que se beneficiaram do sistema proporcional:");
         System.out.println("com sua posição no ranking de mais votados)");
+
+        String impressao;
 
         List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         Candidato candidato;
@@ -103,24 +132,33 @@ public class Relatorio {
             candidato = candidatosMaisVotados.get(i);
             if(candidato.foiEleito() == true){
                 eleitos++;
-            }
-            if(i >= sistema.getNumeroVagas()){
-                if(candidato.ehDeFederacao() == true)
-                    System.out.println("*");
-                
-                System.out.println((i+1) + candidato.getNomeDeUrna() + " (" + candidato.getPartido() + ", " + this.nf.format(candidato.getTotalDeVotos()) + " votos)");
+                if(i >= sistema.getNumeroVagas()){
+                    impressao = (i+1) + " - ";
+                    if(candidato.ehDeFederacao() == true)
+                        impressao += "*";
+                    
+                    impressao += candidato.getNomeDeUrna() + " (" + candidato.getPartido().getSigla() + ", " + this.nf.format(candidato.getTotalDeVotos()) + " votos)";
+                    System.out.println(impressao);
+                }
             }
         }
+
+        System.out.print("\n");
         
     }
     // Relatorio 6: votos totalizados por partido e número de candidatos eleitos
     public void sexto(){
+        System.out.println("Votação dos partidos e número de candidatos eleitos:");
         List <Partido> partidosVotados = sistema.CopiaPartidosVotados();
+        
         int i = 0;
         for (Partido partido : partidosVotados) {
+            // partido.calculaTotalVotosPartido();
             i++;
             System.out.println(i + " - " + partido.getSigla() + " - " + partido.getNumeroDoPartido() + ", " + this.nf.format(partido.getVotosValidos()) + " votos (" + this.nf.format(partido.getVotosNominais()) + " nominais e " + this.nf.format(partido.getVotosDeLegenda()) + " de legenda), " + partido.StringCandidatosEleitos());
         }
+
+        System.out.print("\n");
     }
 
     // Relatorio 7: IGNORADO, por ordens do professor
@@ -131,15 +169,14 @@ public class Relatorio {
         // criando uma nova lista de partidos a partir do candidato mais votado (e só dele)
         List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         List<Partido> partidosTotal = new ArrayList<>();
-        
+
         for (Candidato candidato : candidatosMaisVotados) {
             // vai ignorar partidos que não tenham número positivo de votos
             if(candidato.getTotalDeVotos() > 0 && partidosTotal.contains(candidato.getPartido()) == false){
                 partidosTotal.add(candidato.getPartido());
             }
         }
-
-        // depois de toda a lista de candidatos percorrida, fica a lista de partidos para imprimir
+       
         System.out.println("Primeiro e último colocados de cada partido:");
         Partido partido;
         Candidato primeiroColocado;
@@ -152,22 +189,35 @@ public class Relatorio {
             if(partido.getVotosValidos() > 0){
                 primeiroColocado = partido.getCandidatosPartido().get(0);
                 ultimoColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size() -1);
-                intermediarioColocado = ultimoColocado;
+                
+                // tratando o caso de só haver uma candidatura do partido 
+                if(primeiroColocado != ultimoColocado){
+                    // não incluir candidatos com 0 votos na contagem
+                    // TODO: uma forma eficiente de lidar com empates
+                    int j = 1;
+                    while(ultimoColocado.getTotalDeVotos() == 0){
+                        ultimoColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size() - j);
+                        j++;
+                    }
+                    // intermediarioColocado = ultimoColocado;
 
-                int j = 1;
-                // vai subtraindo uma posicao pra cada vez que tiver um valor igual
-                while(intermediarioColocado != null && intermediarioColocado.getTotalDeVotos() == ultimoColocado.getTotalDeVotos()){
-                    ultimoColocado = intermediarioColocado;
-                    j++;
-                    intermediarioColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size() - j);
+                
+                    // while(intermediarioColocado != null && intermediarioColocado.getTotalDeVotos() == ultimoColocado.getTotalDeVotos()){
+                    //     ultimoColocado = intermediarioColocado;
+                    //     j++;
+                    //     intermediarioColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size() - j);
+                    // }
                 }
+                
                 
 
                 // usando printf para organização (não coloquei nos outros ainda, mas ok)
-                System.out.printf("%d - %s - %d, %s (%d, %d votos)", i+1, partido.getSigla(), partido.getNumeroDoPartido(), primeiroColocado.getNomeDeUrna(), primeiroColocado.getNumeroDoCandidato(), this.nf.format(primeiroColocado.getTotalDeVotos()));
-                System.out.printf("/ %s (%d, %d votos)\n", ultimoColocado.getNomeDeUrna(), ultimoColocado.getNumeroDoCandidato(), this.nf.format(ultimoColocado.getTotalDeVotos()));
+                System.out.printf("%d - %s - %d, %s (%d, %s votos)", i+1, partido.getSigla(), partido.getNumeroDoPartido(), primeiroColocado.getNomeDeUrna(), primeiroColocado.getNumeroDoCandidato(), this.nf.format(primeiroColocado.getTotalDeVotos()));
+                System.out.printf("/ %s (%d, %s votos)\n", ultimoColocado.getNomeDeUrna(), ultimoColocado.getNumeroDoCandidato(), this.nf.format(ultimoColocado.getTotalDeVotos()));
             }
         }
+
+        System.out.print("\n");
     }
     
     // Relatorio 9: faixas etarias
@@ -181,30 +231,33 @@ public class Relatorio {
         int maioresDe60 = 0;
 
         for (Candidato candidato : candidatosMaisVotados) {
-            if(candidato.getIdade() < 30){
-                menoresDe30++;
-            }
-            else if(candidato.getIdade() < 40){
-                de30a40++;
-            }
-            else if(candidato.getIdade() < 50){
-                de40a50++;
-            }
-            else if(candidato.getIdade() < 60){
-                de50a60++;
-            }
-            else if(candidato.getIdade() >= 60){
-                maioresDe60++;
+            if(candidato.foiEleito()){
+                if(candidato.getIdade() < 30){
+                    menoresDe30++;
+                }
+                else if(candidato.getIdade() < 40){
+                    de30a40++;
+                }
+                else if(candidato.getIdade() < 50){
+                    de40a50++;
+                }
+                else if(candidato.getIdade() < 60){
+                    de50a60++;
+                }
+                else if(candidato.getIdade() >= 60){
+                    maioresDe60++;
+                }
             }
             
         }
         System.out.println("Eleitos por faixa etária (na data da eleição):");
-        System.out.println("      Idade < 30: " + menoresDe30 + " (" + this.nf.format((float) 100*menoresDe30/candidatosMaisVotados.size()) + "%)");
-        System.out.println("30 <= Idade < 40: " + de30a40 + " (" + this.nf.format((float) 100*de30a40/candidatosMaisVotados.size()) + "%)");
-        System.out.println("40 <= Idade < 50: " + de40a50 + " (" + this.nf.format((float) 100*de40a50/candidatosMaisVotados.size()) + "%)");
-        System.out.println("50 <= Idade < 60: " + de50a60 + " (" + this.nf.format((float) 100*de50a60/candidatosMaisVotados.size()) + "%)");
-        System.out.println("60 <= Idade     : " + maioresDe60 + " (" + this.nf.format((float) 100*maioresDe60/candidatosMaisVotados.size()) + "%)");
-     
+        System.out.println("      Idade < 30: " + menoresDe30 + " (" + this.nf.format((float) 100*menoresDe30/sistema.getNumeroVagas()) + "%)");
+        System.out.println("30 <= Idade < 40: " + de30a40 + " (" + this.nf.format((float) 100*de30a40/sistema.getNumeroVagas()) + "%)");
+        System.out.println("40 <= Idade < 50: " + de40a50 + " (" + this.nf.format((float) 100*de40a50/sistema.getNumeroVagas()) + "%)");
+        System.out.println("50 <= Idade < 60: " + de50a60 + " (" + this.nf.format((float) 100*de50a60/sistema.getNumeroVagas()) + "%)");
+        System.out.println("60 <= Idade     : " + maioresDe60 + " (" + this.nf.format((float) 100*maioresDe60/sistema.getNumeroVagas()) + "%)");
+        
+        System.out.print("\n");
     }
     
     // Relatorio 10: eleitos por gênero
@@ -214,26 +267,30 @@ public class Relatorio {
         int totalMasculino = 0;
 
         for (Candidato candidato : candidatosMaisVotados) {
-            // codigo Masculino
-            if(candidato.getGenero() == Genero.MASCULINO.getGenero()){
-                totalMasculino++;
-            }
-            // codigo Feminino
-            if(candidato.getGenero() == Genero.FEMININO.getGenero()){
-                totalFeminino++;
+            if(candidato.foiEleito()){
+                // codigo Masculino
+                if(candidato.getGenero() == Genero.MASCULINO.getGenero()){
+                    totalMasculino++;
+                }
+                // codigo Feminino
+                if(candidato.getGenero() == Genero.FEMININO.getGenero()){
+                    totalFeminino++;
+                }
             }
         }
         System.out.println("Eleitos, por gênero:");
-        System.out.println("Feminino:  " + totalFeminino + " (" + this.nf.format((float) 100*totalFeminino/candidatosMaisVotados.size()));
-        System.out.println("Masculino: " + totalMasculino + " (" + this.nf.format((float) 100*totalMasculino/candidatosMaisVotados.size()));
+        System.out.println("Feminino:  " + totalFeminino + " (" + this.nf.format((float) 100*totalFeminino/sistema.getNumeroVagas()) + "%)");
+        System.out.println("Masculino: " + totalMasculino + " (" + this.nf.format((float) 100*totalMasculino/sistema.getNumeroVagas()) + "%)");
 
+        System.out.print("\n");
     }
     
     // Relatório 11: Total de votos válidos, total de votos nominais e total de votos de legenda
     public void decimoPrimeiro(){
-        System.out.println("Total de votos válidos:      " + sistema.getTotalDeVotosValidos());
-        System.out.printf("Total de votos nominais:     %d (%.2f%)\n", sistema.getTotalVotosNominais(), (float) 100*sistema.getTotalVotosNominais()/sistema.getTotalDeVotosValidos());
-        System.out.printf("Total de votos de legenda:   %d (%.2f%)\n", sistema.getTotalVotosLegenda() , (float) 100*sistema.getTotalVotosLegenda()/sistema.getTotalDeVotosValidos());
+        System.out.println("Total de votos válidos:      " + this.nf.format(sistema.getTotalDeVotosValidos()));
+        System.out.printf("Total de votos nominais:     %s (%.2f%%)\n", this.nf.format(sistema.getTotalVotosNominais()), (float) 100*sistema.getTotalVotosNominais()/sistema.getTotalDeVotosValidos());
+        System.out.printf("Total de votos de legenda:   %s (%.2f%%)\n", this.nf.format(sistema.getTotalVotosLegenda()) , (float) 100*sistema.getTotalVotosLegenda()/sistema.getTotalDeVotosValidos());
+        System.out.print("\n");
     }
     
 

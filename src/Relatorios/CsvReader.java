@@ -98,8 +98,8 @@ public class CsvReader {
 
         // ATENCAO: throw de NoSuchElementException se nao houver uma proxima linha;
         if(currentLine == null){
-            // throw new NoSuchElementException("Next line not found"); 
-            return null;
+            throw new NoSuchElementException("Next line not found"); 
+            //return null;
         }
         
         //inicializando o Scanner da linha
@@ -147,6 +147,42 @@ public class CsvReader {
         }
         
         return selectedValuesList;
+    }
+
+    public List<String> nextValues() throws NoSuchElementException{
+
+        //Usando ArrayList para uma operacao de tempo constante         
+        List<String> lineValues = new ArrayList<>(); //tem todos os valoras da linha
+
+        // ATENCAO: throw de NoSuchElementException se nao houver uma proxima linha;
+        if(currentLine == null){
+            throw new NoSuchElementException("Next line not found"); 
+            //return null;
+        }
+        
+        //inicializando o Scanner da linha
+       
+        Scanner lineScanner = new Scanner(currentLine);
+        lineScanner.useDelimiter(delimiter);
+
+        //adicionando os items da linha do arquivo para a lista
+        while(lineScanner.hasNext()){
+            lineValues.add(lineScanner.next());
+        }
+        
+        //o lineScanner nao sera usado mais
+        lineScanner.close();
+
+        //salvar a proxima linha para o proximo uso da funcao
+        //(Os erros podiam estragar a linha atual do fileScanner)
+        
+        if(fileScanner.hasNext()){
+            currentLine = fileScanner.nextLine();
+        }else{
+            currentLine = null;
+        }
+        
+        return lineValues;
     }
 
     //Versao que recebe um Array de Strings
