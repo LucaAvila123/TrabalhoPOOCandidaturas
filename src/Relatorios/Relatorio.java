@@ -77,7 +77,7 @@ public class Relatorio {
     public void terceiro(){
         // irei supor aqui que os relatórios só serão feitos depois de a lista de candidatos já ter sido ordenada
         List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
-        
+        System.out.println("Candidatos mais votados (em ordem decrescente de votação e respeitando número de vagas):");
         String impressao;
         // esse formato tinha dado problema antes por algum motivo na hora de contabilizar
         for(int i = 0; i < sistema.getNumeroVagas(); i++){
@@ -160,9 +160,9 @@ public class Relatorio {
             i++;
             impressao = i + " - " + partido.getSigla() + " - " + partido.getNumeroDoPartido() + ", " + this.nf.format(partido.getVotosValidos());
             if(partido.getVotosValidos() > 1)
-                impressao += "votos";
+                impressao += " votos";
             else
-                impressao += "voto";
+                impressao += " voto";
             
             impressao += " (" + this.nf.format(partido.getVotosNominais());
             
@@ -191,6 +191,7 @@ public class Relatorio {
             // vai ignorar partidos que não tenham número positivo de votos
             if(candidato.getTotalDeVotos() > 0 && partidosTotal.contains(candidato.getPartido()) == false){
                 partidosTotal.add(candidato.getPartido());
+                candidato.getPartido().reordenaListaNoPartido();
             }
         }
        
@@ -200,7 +201,7 @@ public class Relatorio {
         Candidato ultimoColocado;
 
         // candidato posto para colocar o canddidato mais velho em caso de empate
-        Candidato intermediarioColocado;
+        // Candidato intermediarioColocado;
         for(int i = 0; i < partidosTotal.size(); i++){
             partido = partidosTotal.get(i);
             if(partido.getVotosValidos() > 0){
@@ -230,7 +231,7 @@ public class Relatorio {
 
                 // usando printf para organização (não coloquei nos outros ainda, mas ok)
                 System.out.printf("%d - %s - %d, %s (%d, %s votos)", i+1, partido.getSigla(), partido.getNumeroDoPartido(), primeiroColocado.getNomeDeUrna(), primeiroColocado.getNumeroDoCandidato(), this.nf.format(primeiroColocado.getTotalDeVotos()));
-                System.out.printf("/ %s (%d, %s votos)\n", ultimoColocado.getNomeDeUrna(), ultimoColocado.getNumeroDoCandidato(), this.nf.format(ultimoColocado.getTotalDeVotos()));
+                System.out.printf(" / %s (%d, %s votos)\n", ultimoColocado.getNomeDeUrna(), ultimoColocado.getNumeroDoCandidato(), this.nf.format(ultimoColocado.getTotalDeVotos()));
             }
         }
 
@@ -272,7 +273,7 @@ public class Relatorio {
         System.out.println("30 <= Idade < 40: " + de30a40 + " (" + this.df.format((float) 100*de30a40/sistema.getNumeroVagas()) + "%)");
         System.out.println("40 <= Idade < 50: " + de40a50 + " (" + this.df.format((float) 100*de40a50/sistema.getNumeroVagas()) + "%)");
         System.out.println("50 <= Idade < 60: " + de50a60 + " (" + this.df.format((float) 100*de50a60/sistema.getNumeroVagas()) + "%)");
-        System.out.println("60 <= Idade: " + maioresDe60 + " (" + this.df.format((float) 100*maioresDe60/sistema.getNumeroVagas()) + "%)");
+        System.out.println("60 <= Idade : " + maioresDe60 + " (" + this.df.format((float) 100*maioresDe60/sistema.getNumeroVagas()) + "%)");
         
         System.out.print("\n");
     }

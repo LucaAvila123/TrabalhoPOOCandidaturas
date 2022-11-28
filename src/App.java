@@ -138,15 +138,13 @@ public class App {
             if(codigoDoCargo != cargoAtual.getCodigoCargo()) continue;
 
             //validando votos
-            if(VotosInvalidos.ignorarNumero(numeroVotavel)){
-                valoresVotacoes = arquivoVotacoes.nextValues(valuesVotacoes);
-                continue;
-            }
+            if(VotosInvalidos.ignorarNumero(numeroVotavel)) continue;
 
             //declarando votos
             sistema.declaraVotos(numeroVotavel, qtd_votos);
         }
 
+        sistema.somaVotos();
         sistema.reordenaTodasListas();
         
         Relatorio relatorioFinal = new Relatorio(sistema, tipoEleicao);

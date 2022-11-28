@@ -97,14 +97,16 @@ public class SistemaEleitoral {
     public void declararVotosNominais(int numeroDoCandidato, int numeroDeVotos){
         if(CandidatosParticipantes.containsKey(numeroDoCandidato) == true){
             Candidato candidato = CandidatosParticipantes.get(numeroDoCandidato);
-            candidato.adicionarVotos(numeroDeVotos);
+            if(candidato.foiDeferido()){
+                candidato.adicionarVotos(numeroDeVotos);
+            }
             // somando os votos de cada candidato assim
-            if(candidato.destinoVotosLegenda() == true){
-                totalDeVotosDeLegenda += numeroDeVotos;
-            }
-            else{
-                totalDeVotosNominais += numeroDeVotos;
-            }
+            // if(candidato.destinoVotosLegenda() == true){
+                // totalDeVotosDeLegenda += numeroDeVotos;
+            // }
+            // else{
+                // totalDeVotosNominais += numeroDeVotos;
+            // }
         } 
     }
 
@@ -113,7 +115,7 @@ public class SistemaEleitoral {
         if(PartidosParticipantes.containsKey(numeroPartido) == true){
             PartidosParticipantes.get(numeroPartido).adicionarVotosDeLegenda(numeroDeVotos);
 
-            totalDeVotosDeLegenda += numeroDeVotos;
+            // totalDeVotosDeLegenda += numeroDeVotos;
         }
         
     }
@@ -124,10 +126,11 @@ public class SistemaEleitoral {
             declaraVotosDeLegenda(numeroVotavel, numeroDeVotos);
         }
         else{
-            if(CandidatosParticipantes.get(numeroVotavel).destinoVotosLegenda()){
+            if(CandidatosParticipantes.get(numeroVotavel).destinoVotosLegenda())
                 declaraVotosDeLegenda(CandidatosParticipantes.get(numeroVotavel).getPartido().getNumeroDoPartido(), numeroDeVotos);
-            }
-            declararVotosNominais(numeroVotavel, numeroDeVotos);
+            
+            else
+                declararVotosNominais(numeroVotavel, numeroDeVotos);
         }
     }
     
@@ -149,8 +152,6 @@ public class SistemaEleitoral {
         for (Partido partido : PartidosVotados) {
             partido.reordenaListaNoPartido();
             // partido.imprimeCandidatos();
-            // atualizando dados dos partidos no foreach
-            partido.calculaTotalVotosPartido();
         }
         SistemaEleitoral.reordenaLista(CandidatosMaisVotados);
         
@@ -176,6 +177,20 @@ public class SistemaEleitoral {
         }
     }
 
-    
+    // deixando os valores internos todos como 0, somando depois de prontas as listas
+    public void somaVotos(){
+        int votosNominais = 0;
+        int votosLegenda = 0;
+        for (Partido partido : PartidosVotados) {
+            // atualizando dados dos partidos no foreach
+            partido.calculaTotalVotosPartido();
+            votosNominais += partido.getVotosNominais();
+            votosLegenda += partido.getVotosDeLegenda();
+        }
+
+        this.totalDeVotosDeLegenda = votosLegenda;
+        this.totalDeVotosNominais = votosNominais;
+        this.totalDeVotosValidos = votosLegenda + votosNominais;
+    }
 
 }

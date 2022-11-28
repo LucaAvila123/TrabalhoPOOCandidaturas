@@ -9,7 +9,6 @@ public class VotosInvalidos {
      private static List<Integer> lista = Arrays.asList(a);
  
      public static boolean ignorarNumero(int valor){
-         return lista.contains(valor);
-
+        return lista.contains(valor);
     }
 }
