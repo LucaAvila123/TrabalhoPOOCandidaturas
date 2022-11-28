@@ -9,6 +9,7 @@ public class Relatorio {
     
     private Locale localeBR;
     private NumberFormat nf; 
+    private DecimalFormat df;
     private SistemaEleitoral sistema;
     
     // referente aos relatórios para eleição estadual ou federal
@@ -19,7 +20,9 @@ public class Relatorio {
     public Relatorio(SistemaEleitoral sistema, String modo){
         this.localeBR = new Locale("pt", "BR");
         this.nf = NumberFormat.getInstance(this.localeBR);
-        this.nf.setMaximumFractionDigits(2);
+        this.df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(this.localeBR));
+        this.df.setMinimumFractionDigits(2);
+        this.df.setMaximumFractionDigits(2);
         this.sistema = sistema;
         this.modo = modo;
     }
@@ -120,7 +123,7 @@ public class Relatorio {
     // Relatorio 5: candidatos beneficiados pelo sistema proporcional
     public void quinto(){
         System.out.println("Eleitos, que se beneficiaram do sistema proporcional:");
-        System.out.println("com sua posição no ranking de mais votados)");
+        System.out.println("(com sua posição no ranking de mais votados)");
 
         String impressao;
 
@@ -137,7 +140,7 @@ public class Relatorio {
                     if(candidato.ehDeFederacao() == true)
                         impressao += "*";
                     
-                    impressao += candidato.getNomeDeUrna() + " (" + candidato.getPartido().getSigla() + ", " + this.nf.format(candidato.getTotalDeVotos()) + " votos)";
+                    impressao += candidato.getNomeDeUrna() + " (" + candidato.getPartido().getSigla() + ", " + this.nf.format(candidato.getTotalDeVotos())+ " votos)";
                     System.out.println(impressao);
                 }
             }
@@ -150,12 +153,26 @@ public class Relatorio {
     public void sexto(){
         System.out.println("Votação dos partidos e número de candidatos eleitos:");
         List <Partido> partidosVotados = sistema.CopiaPartidosVotados();
-        
+        String impressao;
         int i = 0;
         for (Partido partido : partidosVotados) {
             // partido.calculaTotalVotosPartido();
             i++;
-            System.out.println(i + " - " + partido.getSigla() + " - " + partido.getNumeroDoPartido() + ", " + this.nf.format(partido.getVotosValidos()) + " votos (" + this.nf.format(partido.getVotosNominais()) + " nominais e " + this.nf.format(partido.getVotosDeLegenda()) + " de legenda), " + partido.StringCandidatosEleitos());
+            impressao = i + " - " + partido.getSigla() + " - " + partido.getNumeroDoPartido() + ", " + this.nf.format(partido.getVotosValidos());
+            if(partido.getVotosValidos() > 1)
+                impressao += "votos";
+            else
+                impressao += "voto";
+            
+            impressao += " (" + this.nf.format(partido.getVotosNominais());
+            
+            if(partido.getVotosNominais() > 1)
+                impressao += " nominais";
+            else
+                impressao += " nominal";
+
+            impressao += " e " + this.nf.format(partido.getVotosDeLegenda()) + " de legenda), " + partido.StringCandidatosEleitos(); 
+            System.out.println(impressao);
         }
 
         System.out.print("\n");
@@ -250,12 +267,12 @@ public class Relatorio {
             }
             
         }
-        System.out.println("Eleitos por faixa etária (na data da eleição):");
-        System.out.println("      Idade < 30: " + menoresDe30 + " (" + this.nf.format((float) 100*menoresDe30/sistema.getNumeroVagas()) + "%)");
-        System.out.println("30 <= Idade < 40: " + de30a40 + " (" + this.nf.format((float) 100*de30a40/sistema.getNumeroVagas()) + "%)");
-        System.out.println("40 <= Idade < 50: " + de40a50 + " (" + this.nf.format((float) 100*de40a50/sistema.getNumeroVagas()) + "%)");
-        System.out.println("50 <= Idade < 60: " + de50a60 + " (" + this.nf.format((float) 100*de50a60/sistema.getNumeroVagas()) + "%)");
-        System.out.println("60 <= Idade     : " + maioresDe60 + " (" + this.nf.format((float) 100*maioresDe60/sistema.getNumeroVagas()) + "%)");
+        System.out.println("Eleitos, por faixa etária (na data da eleição):");
+        System.out.println("      Idade < 30: " + menoresDe30 + " (" + this.df.format((float) 100*menoresDe30/sistema.getNumeroVagas()) + "%)");
+        System.out.println("30 <= Idade < 40: " + de30a40 + " (" + this.df.format((float) 100*de30a40/sistema.getNumeroVagas()) + "%)");
+        System.out.println("40 <= Idade < 50: " + de40a50 + " (" + this.df.format((float) 100*de40a50/sistema.getNumeroVagas()) + "%)");
+        System.out.println("50 <= Idade < 60: " + de50a60 + " (" + this.df.format((float) 100*de50a60/sistema.getNumeroVagas()) + "%)");
+        System.out.println("60 <= Idade: " + maioresDe60 + " (" + this.df.format((float) 100*maioresDe60/sistema.getNumeroVagas()) + "%)");
         
         System.out.print("\n");
     }
@@ -279,17 +296,17 @@ public class Relatorio {
             }
         }
         System.out.println("Eleitos, por gênero:");
-        System.out.println("Feminino:  " + totalFeminino + " (" + this.nf.format((float) 100*totalFeminino/sistema.getNumeroVagas()) + "%)");
-        System.out.println("Masculino: " + totalMasculino + " (" + this.nf.format((float) 100*totalMasculino/sistema.getNumeroVagas()) + "%)");
+        System.out.println("Feminino: " + totalFeminino + " (" + this.df.format((float) 100*totalFeminino/sistema.getNumeroVagas()) + "%)");
+        System.out.println("Masculino: " + totalMasculino + " (" + this.df.format((float) 100*totalMasculino/sistema.getNumeroVagas()) + "%)");
 
         System.out.print("\n");
     }
     
     // Relatório 11: Total de votos válidos, total de votos nominais e total de votos de legenda
     public void decimoPrimeiro(){
-        System.out.println("Total de votos válidos:      " + this.nf.format(sistema.getTotalDeVotosValidos()));
-        System.out.printf("Total de votos nominais:     %s (%.2f%%)\n", this.nf.format(sistema.getTotalVotosNominais()), (float) 100*sistema.getTotalVotosNominais()/sistema.getTotalDeVotosValidos());
-        System.out.printf("Total de votos de legenda:   %s (%.2f%%)\n", this.nf.format(sistema.getTotalVotosLegenda()) , (float) 100*sistema.getTotalVotosLegenda()/sistema.getTotalDeVotosValidos());
+        System.out.println("Total de votos válidos: " + this.nf.format(sistema.getTotalDeVotosValidos()));
+        System.out.println("Total de votos nominais: " + this.nf.format(sistema.getTotalVotosNominais()) + " (" + this.df.format((float) 100*sistema.getTotalVotosNominais()/sistema.getTotalDeVotosValidos()) + "%)");
+        System.out.println("Total de votos de legenda: " + this.nf.format(sistema.getTotalVotosLegenda()) + " (" + this.df.format((float) 100*sistema.getTotalVotosLegenda()/sistema.getTotalDeVotosValidos()) + "%)");
         System.out.print("\n");
     }
     
