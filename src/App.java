@@ -126,10 +126,11 @@ public class App {
             
         }
 
+        // int i = 0;
         //contabilisar os votos
         while(arquivoVotacoes.hasNextValues()){
             List<String> valoresVotacoes = arquivoVotacoes.nextValues(valuesVotacoes);
-            
+            // i++;
             int numeroVotavel = Integer.parseInt(unquote(valoresVotacoes.get(1)));
             int qtd_votos = Integer.parseInt(unquote(valoresVotacoes.get(2)));
             int codigoDoCargo = Integer.parseInt(unquote(valoresVotacoes.get(0)));
@@ -141,6 +142,7 @@ public class App {
             if(VotosInvalidos.ignorarNumero(numeroVotavel)) continue;
 
             //declarando votos
+            // System.out.println("Linha " + i);
             sistema.declaraVotos(numeroVotavel, qtd_votos);
         }
 

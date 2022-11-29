@@ -122,16 +122,23 @@ public class SistemaEleitoral {
     
     // escolhe se o voto vai ser de legenda ou não
     public void declaraVotos(int numeroVotavel, int numeroDeVotos){
-        if(PartidosParticipantes.containsKey(numeroVotavel) == true){
-            declaraVotosDeLegenda(numeroVotavel, numeroDeVotos);
-        }
-        else{
-            if(CandidatosParticipantes.get(numeroVotavel).destinoVotosLegenda())
+        // System.out.println(numeroVotavel);
+        boolean ehPartido = PartidosParticipantes.containsKey(numeroVotavel);
+        boolean ehCandidato = CandidatosParticipantes.containsKey(numeroVotavel);
+
+        // feito nesse formato para ignorar partidos que recebam votos apenas por federação
+        if(ehCandidato){
+            if(CandidatosParticipantes.get(numeroVotavel).destinoVotosLegenda()){
                 declaraVotosDeLegenda(CandidatosParticipantes.get(numeroVotavel).getPartido().getNumeroDoPartido(), numeroDeVotos);
-            
-            else
+            } else{
                 declararVotosNominais(numeroVotavel, numeroDeVotos);
+            }
+
         }
+
+        else if(ehPartido){
+            declaraVotosDeLegenda(numeroVotavel, numeroDeVotos);   
+        } 
     }
     
     // cada candidato declarado e cada voto de legenda declarado já está sendo contabilizado

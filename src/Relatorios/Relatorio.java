@@ -200,8 +200,8 @@ public class Relatorio {
         Candidato primeiroColocado;
         Candidato ultimoColocado;
 
-        // candidato posto para colocar o canddidato mais velho em caso de empate
-        // Candidato intermediarioColocado;
+        // candidato posto para colocar o candidato mais velho em caso de empate
+        Candidato intermediarioColocado;
         for(int i = 0; i < partidosTotal.size(); i++){
             partido = partidosTotal.get(i);
             if(partido.getVotosValidos() > 0){
@@ -210,6 +210,7 @@ public class Relatorio {
                 
                 // tratando o caso de só haver uma candidatura do partido 
                 if(primeiroColocado != ultimoColocado){
+
                     // não incluir candidatos com 0 votos na contagem
                     // TODO: uma forma eficiente de lidar com empates
                     int j = 1;
@@ -217,14 +218,16 @@ public class Relatorio {
                         ultimoColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size() - j);
                         j++;
                     }
-                    // intermediarioColocado = ultimoColocado;
+                    intermediarioColocado = ultimoColocado;
 
-                
-                    // while(intermediarioColocado != null && intermediarioColocado.getTotalDeVotos() == ultimoColocado.getTotalDeVotos()){
-                    //     ultimoColocado = intermediarioColocado;
-                    //     j++;
-                    //     intermediarioColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size() - j);
-                    // }
+                    // quantos candidatos ainda serão analisados
+                    int tamanhoRestante = partido.getCandidatosPartido().size() - j;
+
+                    while(tamanhoRestante > j && intermediarioColocado.getTotalDeVotos() == ultimoColocado.getTotalDeVotos()){
+                        ultimoColocado = intermediarioColocado;
+                        j++;
+                        intermediarioColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size() - j);
+                    }
                 }
                 
                 
