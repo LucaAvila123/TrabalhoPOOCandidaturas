@@ -1,8 +1,8 @@
 package Relatorios;
+import java.time.*;
 import java.util.*;
 
 import Candidaturas.*;
-import Estaticos.*;
 
 public class SistemaEleitoral {
     
@@ -63,7 +63,7 @@ public class SistemaEleitoral {
     //serve para inserir um candidato no sistema e nas listas
     public void cadastraCandidato(int numeroPartido, String nomeDeUrna, String dataDeNascimento, int codigoDoCargo,
         int numeroDaFederacao, int numeroDoCandidato, int genero, int situacaoDaTotalizacao, int deferido,
-        String destinoVotos, DataEleicao dataEleicao){
+        String destinoVotos, LocalDate dataEleicao){
 
         if(CandidatosParticipantes.containsKey(numeroDoCandidato) == false){
             Partido partidoDoCandidato = PartidosParticipantes.get(numeroPartido);

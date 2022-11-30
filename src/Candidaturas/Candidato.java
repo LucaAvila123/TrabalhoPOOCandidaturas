@@ -1,6 +1,6 @@
 package Candidaturas;
-import java.text.*;
 import java.time.*;
+import java.time.format.*;
 import java.time.temporal.*;
 
 import Estaticos.*;
@@ -20,13 +20,13 @@ public class Candidato {
     private int deferido;
     private int situacaoDaTotalizacao; // define se o candidato foi eleito 
     private String destinoVotos; // fala se o candidato dá votos de legenda
-    private DataEleicao dataEleicao;
+    private LocalDate dataEleicao;
     private int totalDeVotos = 0; //valor default
     
     //Construtor
     public Candidato(Partido partido, String nomeDeUrna, String dataDeNascimento, int codigoDoCargo,
             int numeroDaFederacao, int numeroDoCandidato, int genero, int situacaoDaTotalizacao, int deferido,
-            String destinoVotos, DataEleicao dataEleicao) {
+            String destinoVotos, LocalDate dataEleicao) {
         this.partido = partido;
         this.nomeDeUrna = nomeDeUrna;
         this.dataDeNascimento = dataDeNascimento; 
@@ -94,20 +94,10 @@ public class Candidato {
     }
 
     //deve retornar a idade do candidato na data indicada em sua construção 
-    public int getIdade() throws ParseException{
+    public int getIdade(){
+        LocalDate diaNascimento = LocalDate.parse(dataDeNascimento, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        return (int) diaNascimento.until(dataEleicao, ChronoUnit.YEARS);
 
-        // talvez conste usar a data da eleição descrita no CSV pra fazer isso aqui
-        String manipulandoData[] = dataDeNascimento.split("/");
-        int diaNascimento = Integer.parseInt(manipulandoData[0]);
-        int mesNascimento = Integer.parseInt(manipulandoData[1]);
-        int anoNascimento = Integer.parseInt(manipulandoData[2]);
-        LocalDateTime dataCandidato = LocalDateTime.of(anoNascimento, mesNascimento, diaNascimento, 0, 0, 0);
-        // a data da eleição de 2022 foi dia 02/10/2022; deixando as constantes em outro arquivo
-        LocalDateTime diaEleicao = LocalDateTime.of(dataEleicao.ANO, dataEleicao.MES, dataEleicao.DIA, 0, 0, 0);
-        
-        //calcula diferença
-        int anos = (int) dataCandidato.until(diaEleicao, ChronoUnit.YEARS);
-        return anos;
     }
 
     //serve para incrementar os votos do candidato

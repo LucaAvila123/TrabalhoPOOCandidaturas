@@ -1,5 +1,8 @@
 import Relatorios.*;
 import Estaticos.*;
+
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -53,7 +56,7 @@ public class App {
         
         // isso daqui é só para inicializar o dia da votação
         // só será usado para setar valoresCandidatos a serem usados no objeto Candidato
-        DataEleicao diaVotacao = new DataEleicao(dataEleicao);
+        LocalDate diaVotacao = LocalDate.parse(dataEleicao, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         
         // SEGUNDA PARTE: leitura dos arquivos de candidatos
 

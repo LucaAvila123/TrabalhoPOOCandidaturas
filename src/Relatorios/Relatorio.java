@@ -212,7 +212,6 @@ public class Relatorio {
                 if(primeiroColocado != ultimoColocado){
 
                     // não incluir candidatos com 0 votos na contagem
-                    // TODO: uma forma eficiente de lidar com empates
                     int j = 1;
                     while(ultimoColocado.getTotalDeVotos() == 0){
                         ultimoColocado = partido.getCandidatosPartido().get(partido.getCandidatosPartido().size() - j);
