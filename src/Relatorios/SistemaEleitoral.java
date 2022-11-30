@@ -64,21 +64,23 @@ public class SistemaEleitoral {
     public void cadastraCandidato(int numeroPartido, String nomeDeUrna, String dataDeNascimento, int codigoDoCargo,
         int numeroDaFederacao, int numeroDoCandidato, int genero, int situacaoDaTotalizacao, int deferido,
         String destinoVotos, LocalDate dataEleicao){
-
+        
         if(CandidatosParticipantes.containsKey(numeroDoCandidato) == false){
             Partido partidoDoCandidato = PartidosParticipantes.get(numeroPartido);
             Candidato candidato = new Candidato(partidoDoCandidato, nomeDeUrna, dataDeNascimento, 
                 codigoDoCargo, numeroDaFederacao,
                 numeroDoCandidato, genero, situacaoDaTotalizacao, deferido,
                 destinoVotos, dataEleicao);
-            // essa hash map usa o número do candidato para busca
-            CandidatosParticipantes.put(numeroDoCandidato, candidato); 
-                                                            
-            // essa lista precisa ser reordenada para bom funcionamento posterior
-            CandidatosMaisVotados.add(candidato);
+            if(candidato.foiDeferido()){
+                // essa hash map usa o número do candidato para busca
+                CandidatosParticipantes.put(numeroDoCandidato, candidato); 
 
-            // insere o candidato na lista de candidatos do partido dele
-            partidoDoCandidato.adicionaCandidato(candidato);
+                // essa lista precisa ser reordenada para bom funcionamento posterior
+                CandidatosMaisVotados.add(candidato);
+
+                // insere o candidato na lista de candidatos do partido dele
+                partidoDoCandidato.adicionaCandidato(candidato);
+            }
         }
 }
 

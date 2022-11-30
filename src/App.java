@@ -57,7 +57,7 @@ public class App {
         // isso daqui é só para inicializar o dia da votação
         // só será usado para setar valoresCandidatos a serem usados no objeto Candidato
         LocalDate diaVotacao = LocalDate.parse(dataEleicao, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        
+
         // SEGUNDA PARTE: leitura dos arquivos de candidatos
 
         //instanciando o sistema eleitoral
@@ -92,10 +92,10 @@ public class App {
         //adiciona aspas para cada elemento
         quote(valuesVotacoes);
 
-
+        int linha = 0;
         //inicializar os candidatos
         while(arquivoCandidatos.hasNextValues()){
-
+            linha++;
             //passando para array pra ficar mais facil e tirando as aspas dos valores
             List<String> valoresCandidatos = arquivoCandidatos.nextValues(valuesCandidatos);
             //dados do partido
@@ -110,6 +110,10 @@ public class App {
             //dados do candidato
             String nomeDeUrna = unquote(valoresCandidatos.get(3));
             String dataDeNascimento = unquote(valoresCandidatos.get(7));
+            if(dataDeNascimento.equals("")){
+                System.out.println("linha " + linha);
+                System.out.println(valoresCandidatos);
+            }
             int codigoDoCargo = Integer.parseInt(unquote(valoresCandidatos.get(0)));
             int numeroDaFederacao = Integer.parseInt(unquote(valoresCandidatos.get(6)));
             int numeroDoCandidato = Integer.parseInt(unquote(valoresCandidatos.get(2)));
