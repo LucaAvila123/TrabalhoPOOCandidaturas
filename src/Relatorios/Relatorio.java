@@ -199,9 +199,10 @@ public class Relatorio {
         Partido partido;
         Candidato primeiroColocado;
         Candidato ultimoColocado;
-
+        
         // candidato posto para colocar o candidato mais velho em caso de empate
         Candidato intermediarioColocado;
+        String impressao;
         for(int i = 0; i < partidosTotal.size(); i++){
             partido = partidosTotal.get(i);
             if(partido.getVotosValidos() > 0){
@@ -229,11 +230,28 @@ public class Relatorio {
                     }
                 }
                 
-                
+                impressao = (i+1) + " - " + partido.getSigla() +
+                    " - " + partido.getNumeroDoPartido()
+                    + ", " + primeiroColocado.getNomeDeUrna() 
+                    + " (" + primeiroColocado.getNumeroDoCandidato() + ", " 
+                    + this.nf.format(primeiroColocado.getTotalDeVotos());
 
-                // usando printf para organização (não coloquei nos outros ainda, mas ok)
-                System.out.printf("%d - %s - %d, %s (%d, %s votos)", i+1, partido.getSigla(), partido.getNumeroDoPartido(), primeiroColocado.getNomeDeUrna(), primeiroColocado.getNumeroDoCandidato(), this.nf.format(primeiroColocado.getTotalDeVotos()));
-                System.out.printf(" / %s (%d, %s votos)\n", ultimoColocado.getNomeDeUrna(), ultimoColocado.getNumeroDoCandidato(), this.nf.format(ultimoColocado.getTotalDeVotos()));
+                if(primeiroColocado.getTotalDeVotos() > 1){
+                    impressao += " votos)"; 
+                } else{
+                    impressao += " voto)";
+                }
+
+                impressao += " / " + ultimoColocado.getNomeDeUrna() 
+                    + " (" + ultimoColocado.getNumeroDoCandidato() + ", " 
+                    + this.nf.format(ultimoColocado.getTotalDeVotos());
+                if(ultimoColocado.getTotalDeVotos() > 1){
+                    impressao += " votos)";
+                } else{
+                    impressao += " voto)";
+                }
+                
+                System.out.println(impressao);
             }
         }
 
@@ -241,7 +259,7 @@ public class Relatorio {
     }
     
     // Relatorio 9: faixas etarias
-    public void nono() throws ParseException{
+    public void nono(){
 
         List<Candidato> candidatosMaisVotados = sistema.CopiaCandidatosMaisVotados();
         int menoresDe30 = 0;
