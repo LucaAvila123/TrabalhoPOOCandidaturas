@@ -8,9 +8,11 @@ public class Partido {
     private int numeroDoPartido;
     private String sigla;
 
-    private int votosValidos;
+    // private int votosValidos;
     private int votosNominais;
-    private int votosDeLegenda; 
+    private int votosDeLegenda;
+
+    private int qtdEleitos;
 
     public Partido(int numeroDoPartido, String sigla) {
         this.numeroDoPartido = numeroDoPartido;
@@ -28,7 +30,7 @@ public class Partido {
     }
 
     public int getVotosValidos() {
-        return votosValidos;
+        return votosDeLegenda + votosNominais;
     }
 
     public int getVotosDeLegenda() {
@@ -39,18 +41,23 @@ public class Partido {
         return votosNominais;
     }
 
+    public int getQtdEleitos() {
+        return qtdEleitos;
+    }
     public List<Candidato> getCandidatosPartido(LocalDate dataEleicao){
-        List<Candidato> candidatosPartido = new ArrayList<Candidato>(candidatosParticipantes.values());
-        Collections.sort(candidatosPartido, (Comparator<? super Candidato>) (Candidato a, Candidato b)
+        List<Candidato> candidatosPartido = new ArrayList<>(candidatosParticipantes.values());
+        Collections.sort(candidatosPartido, (Candidato a, Candidato b)
         -> a.getTotalDeVotos() == b.getTotalDeVotos() 
             ? (a.getIdade(dataEleicao) == b.getIdade(dataEleicao) 
-                ?  a.getNumeroDoCandidato() - b.getNumeroDoCandidato() 
-                : b.getIdade(dataEleicao) - a.getIdade(dataEleicao))
+                ?  b.getNumeroDoCandidato() - a.getNumeroDoCandidato() 
+            : b.getIdade(dataEleicao) - a.getIdade(dataEleicao))
         : b.getTotalDeVotos() - a.getTotalDeVotos());
         return candidatosPartido;
     }
 
     public void adicionaCandidato(Candidato candidato){
+        if(candidato.getSituacaoTot() == SituacaoTotalizacaoCandidato.ELEITO)
+            qtdEleitos++;
         candidatosParticipantes.putIfAbsent(candidato.getNumeroDoCandidato(), candidato);
     }
 
@@ -65,15 +72,15 @@ public class Partido {
     }
 
     //Retorna a lista de candidatos que foram eleitos
-    public List<Candidato> getCandidatosEleitos(){
-        List<Candidato> candidatosEleitos = new ArrayList<>();
-
-        for (Candidato candidato : candidatosParticipantes.values()) {
-            if(candidato.getSituacaoTot() == SituacaoTotalizacaoCandidato.ELEITO){
-                candidatosEleitos.add(candidato);
-            }
-        }
-        return candidatosEleitos;
-    }
+    // public List<Candidato> getCandidatosEleitos(){
+        // List<Candidato> candidatosEleitos = new ArrayList<>();
+    // 
+        // for (Candidato candidato : candidatosParticipantes.values()) {
+            // if(candidato.getSituacaoTot() == SituacaoTotalizacaoCandidato.ELEITO){
+                // candidatosEleitos.add(candidato);
+            // }
+        // }
+        // return candidatosEleitos;
+    // }
 
 }

@@ -1,5 +1,6 @@
 package Relatorios;
 
+import java.time.*;
 import java.util.*;
 import Candidaturas.*;
 
@@ -28,18 +29,30 @@ public enum SistemaEleitoral {
         return partidosParticipantes.get(busca);
     }
 
-    public Partido getCandidato(int busca){
-        return partidosParticipantes.get(busca);
+    public Candidato getCandidato(int busca){
+        return candidatosParticipantes.get(busca);
     }
 
     //deve retornar uma lista com todos os candidatos
-    public List<Candidato> getCandidatos(){
-        return new ArrayList<>(candidatosParticipantes.values());
+    public List<Candidato> getCandidatos(LocalDate dataEleicao){
+        List<Candidato> candidatos = new ArrayList<>(candidatosParticipantes.values());
+        Collections.sort(candidatos, (Candidato a, Candidato b)
+        -> a.getTotalDeVotos() == b.getTotalDeVotos() 
+            ? (a.getIdade(dataEleicao) == b.getIdade(dataEleicao) 
+                ?  a.getNumeroDoCandidato() - b.getNumeroDoCandidato() 
+                : b.getIdade(dataEleicao) - a.getIdade(dataEleicao))
+        : b.getTotalDeVotos() - a.getTotalDeVotos());
+        return candidatos;
     }
     
     //deve retornar uma lista com todos os partidos
     public List<Partido> getPartidos(){
-        return new ArrayList<>(partidosParticipantes.values());
+        List<Partido> partidos = new ArrayList<>(partidosParticipantes.values());
+        Collections.sort(partidos, (Partido a, Partido b)
+        -> a.getVotosValidos() == b.getVotosValidos() 
+            ? a.getNumeroDoPartido() - b.getNumeroDoPartido()
+        : b.getVotosValidos() - a.getVotosValidos());
+        return partidos;
     }
 
     //serve para inserir um candidato no sistema e nas listas
@@ -52,12 +65,17 @@ public enum SistemaEleitoral {
         if(partido == null){
             throw new RuntimeException("Partido de numero " + numeroPartido + " nao encontrado");
         }
+        // só vai incluir os deferidos na lista
+        if(SituacaoInscricaoCandidato.verificaCodigo(deferido) == SituacaoInscricaoCandidato.DEFERIDO){
+            Candidato candidato = new Candidato(partido, 
+            nomeDeUrna, dataDeNascimento, codigoDoCargo, numeroDaFederacao,
+            numeroDoCandidato, genero, situacaoDaTotalizacao, deferido,
+            destinoVotos);
 
-        //Assumindo que cada candidato vai ter um numero unico
-        candidatosParticipantes.putIfAbsent(numeroDoCandidato, new Candidato(partido, 
-                                                        nomeDeUrna, dataDeNascimento, codigoDoCargo, numeroDaFederacao,
-                                                        numeroDoCandidato, genero, situacaoDaTotalizacao, deferido,
-                                                        destinoVotos));
+            //Assumindo que cada candidato vai ter um numero unico
+            candidatosParticipantes.putIfAbsent(numeroDoCandidato, candidato);
+            partido.adicionaCandidato(candidato);
+        }
     }
     
     //Retorna o partido cadastrado mais antigo ou o proprio partido
@@ -75,7 +93,7 @@ public enum SistemaEleitoral {
 
     // procura na tabela hash de candidatos o candidato e incrementa o número de votos colocados
     // acredito que a versão anterior do trabalho estava dando problema por usar isso para os votos de legenda
-    private void declaraVotosNominais(int numeroDoCandidato, int numeroDeVotos){
+    public void declaraVotosNominais(int numeroDoCandidato, int numeroDeVotos){
 
         Candidato candidato = candidatosParticipantes.get(numeroDoCandidato);
         if(candidato != null){
@@ -88,10 +106,11 @@ public enum SistemaEleitoral {
                 totalDeVotosNominais += numeroDeVotos;
             }
         }
+        totalDeVotosValidos = totalDeVotosDeLegenda + totalDeVotosNominais;
     }
 
     // procura na tabela hash de partidos e incrementa o número de votos de legenda
-    private void declaraVotosDeLegenda(int numeroPartido, int numeroDeVotos){
+    public void declaraVotosDeLegenda(int numeroPartido, int numeroDeVotos){
         
         Partido partido = partidosParticipantes.get(numeroPartido);
         
@@ -102,6 +121,7 @@ public enum SistemaEleitoral {
             partido.adicionarVotosDeLegenda(numeroDeVotos);
             totalDeVotosDeLegenda += numeroDeVotos;
         }
+        totalDeVotosValidos = totalDeVotosDeLegenda + totalDeVotosNominais;
     }
 
     public void declaraVotos(int numeroVotavel, int numeroDeVotos){
@@ -109,5 +129,6 @@ public enum SistemaEleitoral {
         // um candidato e um partido não têm o mesmo número pra votação em deputado
         this.declaraVotosDeLegenda(numeroVotavel, numeroDeVotos);
         this.declaraVotosNominais(numeroVotavel, numeroDeVotos);
+        totalDeVotosValidos = totalDeVotosDeLegenda + totalDeVotosNominais;
     }
 }

@@ -5,6 +5,8 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import Candidaturas.Candidato;
+
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -146,11 +148,23 @@ public class App {
             if(codigoDoCargo != cargoAtual.getCodigoCargo()) continue;
 
             //validando votos
-            if(VotosInvalidos.ignorarNumero(numeroVotavel)) continue;
+            int[] codigosDeVotosInvalidos = {95, 96, 97, 98};
+            if(Arrays.binarySearch(codigosDeVotosInvalidos, numeroVotavel) >= 0) continue;
 
             //declarando votos
             // System.out.println("Linha " + i);
-            sistema.declaraVotos(numeroVotavel, qtd_votos);
+            
+            Candidato candidatoVotado = sistema.getCandidato(numeroVotavel);
+            if(candidatoVotado != null){
+                if(candidatoVotado.isCandidatoLegenda()){
+                    sistema.declaraVotosDeLegenda(candidatoVotado.getPartido().getNumeroDoPartido(), qtd_votos);
+                }else{
+                    sistema.declaraVotosNominais(numeroVotavel, qtd_votos);
+                }
+            }else{
+                sistema.declaraVotosDeLegenda(numeroVotavel, qtd_votos);
+            }
+
         }
         
         Relatorio relatorioFinal = new Relatorio(sistema, tipoEleicao, diaVotacao);

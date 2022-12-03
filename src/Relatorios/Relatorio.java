@@ -31,20 +31,8 @@ public class Relatorio {
         this.sistema = sistema;
         this.modo = modo;
         this.dataEleicao = dataEleicao;
-        this.candidatos = sistema.getCandidatos();
+        this.candidatos = sistema.getCandidatos(dataEleicao);
         this.partidos = sistema.getPartidos();
-        
-        Collections.sort(candidatos, (Comparator<? super Candidato>) (Candidato a, Candidato b)
-        -> a.getTotalDeVotos() == b.getTotalDeVotos() 
-            ? (a.getIdade(dataEleicao) == b.getIdade(dataEleicao) 
-                ?  a.getNumeroDoCandidato() - b.getNumeroDoCandidato() 
-                : b.getIdade(dataEleicao) - a.getIdade(dataEleicao))
-        : b.getTotalDeVotos() - a.getTotalDeVotos());
-
-        Collections.sort(partidos, (Comparator<? super Partido>) (Partido a, Partido b)
-        -> a.getVotosValidos() == b.getVotosValidos() 
-            ? a.getNumeroDoPartido() - b.getNumeroDoPartido()
-        : b.getVotosValidos() - a.getVotosValidos());
         
     }
     
@@ -125,7 +113,7 @@ public class Relatorio {
 
         String impressao;
 
-        List<Candidato> candidatosMaisVotados = sistema.getCandidatos();
+        List<Candidato> candidatosMaisVotados = sistema.getCandidatos(dataEleicao);
         Candidato candidato;
 
         for(int i = 0; i < this.numeroDeVagas; i++){
@@ -193,7 +181,7 @@ public class Relatorio {
 
             impressao += " e " + this.nf.format(partido.getVotosDeLegenda()) + " de legenda), ";
             
-            int totalEleitos = partido.getCandidatosEleitos().size();
+            int totalEleitos = partido.getQtdEleitos();
             
             if(totalEleitos > 1){
                 impressao += nf.format(totalEleitos) + " candidatos eleitos";
@@ -237,7 +225,7 @@ public class Relatorio {
                 ultimoColocado = candidatos.get(candidatos.size() -1);
                 
                 // tratando o caso de só haver uma candidatura do partido 
-                if(primeiroColocado != ultimoColocado){
+               /* if(primeiroColocado != ultimoColocado){
 
                     // não incluir candidatos com 0 votos na contagem
                     int j = 1;
@@ -256,7 +244,7 @@ public class Relatorio {
                         intermediarioColocado = candidatos.get(candidatos.size() - j);
                     }
                 }
-                
+                */
                 impressao = (i+1) + " - " + partido.getSigla() +
                     " - " + partido.getNumeroDoPartido()
                     + ", " + primeiroColocado.getNomeDeUrna() 
@@ -288,7 +276,7 @@ public class Relatorio {
     // Relatorio 9: faixas etarias
     public void nono(){
 
-        List<Candidato> candidatosMaisVotados = sistema.getCandidatos();
+        List<Candidato> candidatosMaisVotados = sistema.getCandidatos(dataEleicao);
         int menoresDe30 = 0;
         int de30a40 = 0;
         int de40a50 = 0;
@@ -320,14 +308,14 @@ public class Relatorio {
         System.out.println("30 <= Idade < 40: " + this.nf.format(de30a40) + " (" + this.df.format((float) 100*de30a40/this.numeroDeVagas) + "%)");
         System.out.println("40 <= Idade < 50: " + this.nf.format(de40a50) + " (" + this.df.format((float) 100*de40a50/this.numeroDeVagas) + "%)");
         System.out.println("50 <= Idade < 60: " + this.nf.format(de50a60) + " (" + this.df.format((float) 100*de50a60/this.numeroDeVagas) + "%)");
-        System.out.println("60 <= Idade : " + this.nf.format(maioresDe60) + " (" + this.df.format((float) 100*maioresDe60/this.numeroDeVagas) + "%)");
+        System.out.println("60 <= Idade     : " + this.nf.format(maioresDe60) + " (" + this.df.format((float) 100*maioresDe60/this.numeroDeVagas) + "%)");
         
         System.out.print("\n");
     }
     
     // Relatorio 10: eleitos por gênero
     public void decimo(){
-        List<Candidato> candidatosMaisVotados = sistema.getCandidatos();
+        List<Candidato> candidatosMaisVotados = sistema.getCandidatos(dataEleicao);
         int totalFeminino = 0;
         int totalMasculino = 0;
 
@@ -344,7 +332,7 @@ public class Relatorio {
             }
         }
         System.out.println("Eleitos, por gênero:");
-        System.out.println("Feminino: " + this.nf.format(totalFeminino) + " (" + this.df.format((float) 100*totalFeminino/this.numeroDeVagas) + "%)");
+        System.out.println("Feminino:  " + this.nf.format(totalFeminino) + " (" + this.df.format((float) 100*totalFeminino/this.numeroDeVagas) + "%)");
         System.out.println("Masculino: " + this.nf.format(totalMasculino) + " (" + this.df.format((float) 100*totalMasculino/this.numeroDeVagas) + "%)");
 
         System.out.print("\n");
@@ -352,8 +340,8 @@ public class Relatorio {
     
     // Relatório 11: Total de votos válidos, total de votos nominais e total de votos de legenda
     public void decimoPrimeiro(){
-        System.out.println("Total de votos válidos: " + this.nf.format(sistema.getTotalDeVotosValidos()));
-        System.out.println("Total de votos nominais: " + this.nf.format(sistema.getTotalVotosNominais()) + " (" + this.df.format((float) 100*sistema.getTotalVotosNominais()/sistema.getTotalDeVotosValidos()) + "%)");
+        System.out.println("Total de votos válidos:    " + this.nf.format(sistema.getTotalDeVotosValidos()));
+        System.out.println("Total de votos nominais:   " + this.nf.format(sistema.getTotalVotosNominais()) + " (" + this.df.format((float) 100*sistema.getTotalVotosNominais()/sistema.getTotalDeVotosValidos()) + "%)");
         System.out.println("Total de votos de legenda: " + this.nf.format(sistema.getTotalVotosLegenda()) + " (" + this.df.format((float) 100*sistema.getTotalVotosLegenda()/sistema.getTotalDeVotosValidos()) + "%)");
         System.out.print("\n");
     }
