@@ -1,27 +1,21 @@
 package Candidaturas;
-
+import java.time.*;
 import java.util.*;
 
-import Relatorios.*;
-
-// import Relatorios.SistemaEleitoral;
-
 public class Partido {
+
+    private LinkedHashMap<Integer, Candidato> candidatosParticipantes;
     private int numeroDoPartido;
     private String sigla;
 
-    private int votosValidos = 0;
-    private int votosNominais = 0;
-    private int votosDeLegenda = 0; 
+    private int votosValidos;
+    private int votosNominais;
+    private int votosDeLegenda; 
 
-    // a lista aqui é a estrutura de dados escolhida porque não será necessário acessar diretamente os valores
-    private List<Candidato> candidatosPartido;
-
-    //Constructor
     public Partido(int numeroDoPartido, String sigla) {
         this.numeroDoPartido = numeroDoPartido;
         this.sigla = sigla;
-        this.candidatosPartido = new ArrayList<>();
+        this.candidatosParticipantes = new LinkedHashMap<>();
     }
 
     //Getters
@@ -45,14 +39,19 @@ public class Partido {
         return votosNominais;
     }
 
-    public List<Candidato> getCandidatosPartido(){
-        return new ArrayList<Candidato>(candidatosPartido);
+    public List<Candidato> getCandidatosPartido(LocalDate dataEleicao){
+        List<Candidato> candidatosPartido = new ArrayList<Candidato>(candidatosParticipantes.values());
+        Collections.sort(candidatosPartido, (Comparator<? super Candidato>) (Candidato a, Candidato b)
+        -> a.getTotalDeVotos() == b.getTotalDeVotos() 
+            ? (a.getIdade(dataEleicao) == b.getIdade(dataEleicao) 
+                ?  a.getNumeroDoCandidato() - b.getNumeroDoCandidato() 
+                : b.getIdade(dataEleicao) - a.getIdade(dataEleicao))
+        : b.getTotalDeVotos() - a.getTotalDeVotos());
+        return candidatosPartido;
     }
 
     public void adicionaCandidato(Candidato candidato){
-        // talvez precise verificar se o candidato já está inserido no partido
-        
-        candidatosPartido.add(candidato);
+        candidatosParticipantes.putIfAbsent(candidato.getNumeroDoCandidato(), candidato);
     }
 
     //votos nominais so podem ser realizados ao votar em um candidato
@@ -65,43 +64,16 @@ public class Partido {
         votosDeLegenda += numeroDeVotosDeLegenda;
     }
 
-    public void calculaTotalVotosPartido(){
-        votosValidos = votosDeLegenda + votosNominais;
-    }
+    //Retorna a lista de candidatos que foram eleitos
+    public List<Candidato> getCandidatosEleitos(){
+        List<Candidato> candidatosEleitos = new ArrayList<>();
 
-    public void reordenaListaNoPartido(){
-        SistemaEleitoral.reordenaLista(candidatosPartido);
-    }
-
-    // calculando quantidade de candidatos eleitos
-    public int getCandidatosEleitos(){
-        int i = 0;
-        for (Candidato candidato : candidatosPartido) {
-            if(candidato.foiEleito() == true){
-                i++;
+        for (Candidato candidato : candidatosParticipantes.values()) {
+            if(candidato.getSituacaoTot() == SituacaoTotalizacaoCandidato.ELEITO){
+                candidatosEleitos.add(candidato);
             }
         }
-
-        return i;
-    }
-    
-    public String StringCandidatosEleitos(){
-        int totalCandidatosEleitos = this.getCandidatosEleitos();
-        String quantosEleitos = totalCandidatosEleitos + " ";
-        if(totalCandidatosEleitos > 1){
-            quantosEleitos += "candidatos eleitos";
-        }
-        else{
-            quantosEleitos += "candidato eleito";
-        }
-
-        return quantosEleitos;
+        return candidatosEleitos;
     }
 
-    public void imprimeCandidatos(){
-        System.out.println(this.getSigla() + ":");
-        for (Candidato candidato : candidatosPartido) {
-            System.out.println(candidato.getNomeDeUrna());
-        }
-    }
 }

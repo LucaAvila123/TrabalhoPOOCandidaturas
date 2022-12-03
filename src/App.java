@@ -61,7 +61,7 @@ public class App {
         // SEGUNDA PARTE: leitura dos arquivos de candidatos
 
         //instanciando o sistema eleitoral
-        SistemaEleitoral sistema = new SistemaEleitoral();
+        SistemaEleitoral sistema = SistemaEleitoral.INSTANCE;
 
         //Gerenciadoes das linhas do arquivo
         CsvReader arquivoCandidatos = new CsvReader(arquivoCandidaturas, ";", "ISO-8859-1", true);
@@ -129,7 +129,7 @@ public class App {
 
             
             // System.out.println(valoresCandidatos);
-            sistema.cadastraCandidato(numeroPartido, nomeDeUrna, dataDeNascimento, codigoDoCargo, numeroDaFederacao, numeroDoCandidato, genero, situacaoDaTotalizacao, deferido, destinoVotos, diaVotacao);
+            sistema.cadastraCandidato(numeroPartido, nomeDeUrna, dataDeNascimento, codigoDoCargo, numeroDaFederacao, numeroDoCandidato, genero, situacaoDaTotalizacao, deferido, destinoVotos);
             
         }
 
@@ -152,11 +152,8 @@ public class App {
             // System.out.println("Linha " + i);
             sistema.declaraVotos(numeroVotavel, qtd_votos);
         }
-
-        sistema.somaVotos();
-        sistema.reordenaTodasListas();
         
-        Relatorio relatorioFinal = new Relatorio(sistema, tipoEleicao);
+        Relatorio relatorioFinal = new Relatorio(sistema, tipoEleicao, diaVotacao);
     
         relatorioFinal.primeiro();
         relatorioFinal.segundo();

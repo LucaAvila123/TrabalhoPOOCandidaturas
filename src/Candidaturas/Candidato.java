@@ -1,43 +1,49 @@
+
 package Candidaturas;
 import java.time.*;
 import java.time.format.*;
 import java.time.temporal.*;
 
-import Estaticos.*;
-
-
 public class Candidato {
     //Dados para o Candidato
-    private Partido partido;
-    
-    private String nomeDeUrna; 
-    private String dataDeNascimento;
 
+    //Um candidato tem apenas um partido
+    private Partido partido;
+
+    private String nomeDeUrna; 
+    private LocalDate dataDeNascimento;
     private int codigoDoCargo;
     private int numeroDaFederacao;
     private int numeroDoCandidato;
-    private int genero; 
-    private int deferido;
-    private int situacaoDaTotalizacao; // define se o candidato foi eleito 
-    private String destinoVotos; // fala se o candidato dá votos de legenda
-    private LocalDate dataEleicao;
-    private int totalDeVotos = 0; //valor default
-    
-    //Construtor
+    private int genero;
+    private boolean candidatoLegenda;
+
+    private SituacaoInscricaoCandidato situacaoInsc;
+
+    private SituacaoTotalizacaoCandidato situacaoTot; // define se o candidato foi eleito
+
+    private SituacaoFederacaoCandidato situacaoFed;
+
+    private int totalDeVotos;
+
     public Candidato(Partido partido, String nomeDeUrna, String dataDeNascimento, int codigoDoCargo,
-            int numeroDaFederacao, int numeroDoCandidato, int genero, int situacaoDaTotalizacao, int deferido,
-            String destinoVotos, LocalDate dataEleicao) {
+    int numeroDaFederacao, int numeroDoCandidato, int genero, int situacaoDaTotalizacao, int deferido,
+    String destinoVotos) {
+        
+        partido.adicionaCandidato(this);
         this.partido = partido;
+
         this.nomeDeUrna = nomeDeUrna;
-        this.dataDeNascimento = dataDeNascimento; 
+        this.dataDeNascimento = LocalDate.parse(dataDeNascimento, DateTimeFormatter.ofPattern("dd/MM/yyyy")); 
         this.codigoDoCargo = codigoDoCargo;
         this.numeroDaFederacao = numeroDaFederacao;
         this.numeroDoCandidato = numeroDoCandidato;
-        this.genero = genero; 
-        this.situacaoDaTotalizacao = situacaoDaTotalizacao;
-        this.deferido = deferido;
-        this.destinoVotos = destinoVotos;
-        this.dataEleicao = dataEleicao;
+        this.genero = genero;
+        this.candidatoLegenda = destinoVotos.equals("Válido (legenda)");
+        
+        this.situacaoTot = SituacaoTotalizacaoCandidato.verifica(situacaoDaTotalizacao);
+        this.situacaoInsc = SituacaoInscricaoCandidato.verificaCodigo(deferido);
+        this.situacaoFed = SituacaoFederacaoCandidato.verificaCodigo(numeroDaFederacao);
     }
 
     //Getters
@@ -49,8 +55,9 @@ public class Candidato {
         return nomeDeUrna;
     }
 
+    //TODO: TESTAR ISSO
     public String getDataDeNascimento() {
-        return dataDeNascimento;
+        return dataDeNascimento.toString();
     }
 
     public int getCodigoDoCargo() {
@@ -68,36 +75,31 @@ public class Candidato {
     public int getGenero() {
         return genero;
     }
-    
-    // foi deferido
-    public boolean foiDeferido(){
-        return Deferido.igualDeferido(deferido);
+
+    public SituacaoTotalizacaoCandidato getSituacaoTot() {
+        return situacaoTot;
     }
 
-    // vai pra legenda
-    public boolean destinoVotosLegenda(){
-        return Legenda.vaiPraLegenda(destinoVotos);
-    }
-    
-    // os números 2  e 16 na situação de totalização dizem se o candidato foi eleito
-    public boolean foiEleito(){
-        return Eleito.igualEleito(this.situacaoDaTotalizacao);
+    public SituacaoInscricaoCandidato getSituacaoInsc() {
+        return situacaoInsc;
     }
 
-    // o número -1 indica que o candidato não participa de federação
-    public boolean ehDeFederacao(){
-        return Federado.ehFederado(numeroDaFederacao);
+    public SituacaoFederacaoCandidato getSituacaoFed() {
+        return situacaoFed;
     }
 
     public int getTotalDeVotos() {
         return totalDeVotos;
     }
 
-    //deve retornar a idade do candidato na data indicada em sua construção 
-    public int getIdade(){
-        LocalDate diaNascimento = LocalDate.parse(dataDeNascimento, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        return (int) diaNascimento.until(dataEleicao, ChronoUnit.YEARS);
+    public boolean isCandidatoLegenda(){
+        return candidatoLegenda;
+    }
 
+    //TODO: TESTAR ISSO
+    //deve retornar a idade do candidato na data indicada em sua construção 
+    public int getIdade(LocalDate dataEleicao){
+        return (int) dataDeNascimento.until(dataEleicao, ChronoUnit.YEARS);
     }
 
     //serve para incrementar os votos do candidato
@@ -111,14 +113,4 @@ public class Candidato {
         return this.nomeDeUrna + " " + this.numeroDoCandidato + " "; 
     }
 
-    
-    public int compareTo(Candidato o) {
-        if (this.totalDeVotos < o.totalDeVotos) {
-            return -1;
-        }
-        if (this.totalDeVotos > o.totalDeVotos) {
-            return 1;
-        }
-        return 0;
-    }
 }
