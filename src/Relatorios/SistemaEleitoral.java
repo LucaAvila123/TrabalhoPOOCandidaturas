@@ -36,22 +36,36 @@ public enum SistemaEleitoral {
     //deve retornar uma lista com todos os candidatos
     public List<Candidato> getCandidatos(LocalDate dataEleicao){
         List<Candidato> candidatos = new ArrayList<>(candidatosParticipantes.values());
-        Collections.sort(candidatos, (Candidato a, Candidato b)
-        -> a.getTotalDeVotos() == b.getTotalDeVotos() 
-            ? (a.getIdade(dataEleicao) == b.getIdade(dataEleicao) 
-                ?  a.getNumeroDoCandidato() - b.getNumeroDoCandidato() 
-                : b.getIdade(dataEleicao) - a.getIdade(dataEleicao))
-        : b.getTotalDeVotos() - a.getTotalDeVotos());
+        Collections.sort(candidatos, (Candidato a, Candidato b)->
+        {
+            int ordem = b.getTotalDeVotos() - a.getTotalDeVotos();
+
+            if(ordem == 0){
+                ordem = b.getIdade(dataEleicao) - a.getIdade(dataEleicao);
+                
+                if(ordem == 0){
+                    return a.getNumeroDoCandidato() - b.getNumeroDoCandidato();
+                }
+                return ordem;
+            }
+            return ordem;
+        });
         return candidatos;
     }
     
     //deve retornar uma lista com todos os partidos
     public List<Partido> getPartidos(){
         List<Partido> partidos = new ArrayList<>(partidosParticipantes.values());
-        Collections.sort(partidos, (Partido a, Partido b)
-        -> a.getVotosValidos() == b.getVotosValidos() 
-            ? a.getNumeroDoPartido() - b.getNumeroDoPartido()
-        : b.getVotosValidos() - a.getVotosValidos());
+        Collections.sort(partidos, (Partido a, Partido b)->
+        {
+            int ordem = b.getVotosValidos() - a.getVotosValidos();
+
+            if(ordem == 0){
+                return a.getNumeroDoPartido() - b.getNumeroDoPartido();
+            }
+
+            return ordem;
+        });
         return partidos;
     }
 
@@ -66,7 +80,7 @@ public enum SistemaEleitoral {
             throw new RuntimeException("Partido de numero " + numeroPartido + " nao encontrado");
         }
         // só vai incluir os deferidos na lista
-        if(SituacaoInscricaoCandidato.verificaCodigo(deferido) == SituacaoInscricaoCandidato.DEFERIDO){
+        if(SituacaoInscricaoCandidato.verificaCodigo(deferido) == SituacaoInscricaoCandidato.DEFERIDO || destinoVotos.equals("Válido (legenda)")){
             Candidato candidato = new Candidato(partido, 
             nomeDeUrna, dataDeNascimento, codigoDoCargo, numeroDaFederacao,
             numeroDoCandidato, genero, situacaoDaTotalizacao, deferido,
@@ -74,6 +88,7 @@ public enum SistemaEleitoral {
 
             //Assumindo que cada candidato vai ter um numero unico
             candidatosParticipantes.putIfAbsent(numeroDoCandidato, candidato);
+            
             partido.adicionaCandidato(candidato);
         }
     }
@@ -124,11 +139,4 @@ public enum SistemaEleitoral {
         totalDeVotosValidos = totalDeVotosDeLegenda + totalDeVotosNominais;
     }
 
-    public void declaraVotos(int numeroVotavel, int numeroDeVotos){
-        // as funções de declarar voto já incluem busca de algo com resultado nulo
-        // um candidato e um partido não têm o mesmo número pra votação em deputado
-        this.declaraVotosDeLegenda(numeroVotavel, numeroDeVotos);
-        this.declaraVotosNominais(numeroVotavel, numeroDeVotos);
-        totalDeVotosValidos = totalDeVotosDeLegenda + totalDeVotosNominais;
-    }
 }

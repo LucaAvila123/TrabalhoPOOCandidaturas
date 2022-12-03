@@ -44,14 +44,27 @@ public class Partido {
     public int getQtdEleitos() {
         return qtdEleitos;
     }
+    
+    // a ordenação dessa lista deixa os com menores números de candidato por último
     public List<Candidato> getCandidatosPartido(LocalDate dataEleicao){
         List<Candidato> candidatosPartido = new ArrayList<>(candidatosParticipantes.values());
-        Collections.sort(candidatosPartido, (Candidato a, Candidato b)
-        -> a.getTotalDeVotos() == b.getTotalDeVotos() 
-            ? (a.getIdade(dataEleicao) == b.getIdade(dataEleicao) 
-                ?  b.getNumeroDoCandidato() - a.getNumeroDoCandidato() 
-            : b.getIdade(dataEleicao) - a.getIdade(dataEleicao))
-        : b.getTotalDeVotos() - a.getTotalDeVotos());
+        
+        Collections.sort(candidatosPartido, (Candidato a, Candidato b) -> 
+        {
+            int ordem = b.getTotalDeVotos() - a.getTotalDeVotos();
+            
+            if(ordem == 0){
+                ordem = b.getIdade(dataEleicao) - a.getIdade(dataEleicao);
+                
+                if(ordem == 0){
+                    return b.getNumeroDoCandidato() - a.getNumeroDoCandidato();
+                }
+
+                return ordem;
+            }
+
+            return ordem;
+        });
         return candidatosPartido;
     }
 

@@ -214,37 +214,21 @@ public class Relatorio {
         Candidato primeiroColocado;
         Candidato ultimoColocado;
         
-        // candidato posto para colocar o candidato mais velho em caso de empate
-        Candidato intermediarioColocado;
         String impressao;
         for(int i = 0; i < partidosTotal.size(); i++){
             partido = partidosTotal.get(i);
             if(partido.getVotosValidos() > 0){ 
                 List<Candidato> candidatos = partido.getCandidatosPartido(dataEleicao);
                 primeiroColocado = candidatos.get(0);
-                ultimoColocado = candidatos.get(candidatos.size() -1);
-                
-                // tratando o caso de só haver uma candidatura do partido 
-               /* if(primeiroColocado != ultimoColocado){
+                ultimoColocado = candidatos.get(candidatos.size() - 1);
+                int j = 1;
 
-                    // não incluir candidatos com 0 votos na contagem
-                    int j = 1;
-                    while(ultimoColocado.getTotalDeVotos() == 0){
-                        ultimoColocado = candidatos.get(candidatos.size() - j);
-                        j++;
-                    }
-                    intermediarioColocado = ultimoColocado;
-
-                    // quantos candidatos ainda serão analisados
-                    int tamanhoRestante = candidatos.size() - j;
-
-                    while(tamanhoRestante > j && intermediarioColocado.getTotalDeVotos() == ultimoColocado.getTotalDeVotos()){
-                        ultimoColocado = intermediarioColocado;
-                        j++;
-                        intermediarioColocado = candidatos.get(candidatos.size() - j);
-                    }
+                // por padrão de projeto, o candidato de legenda sempre tem 0 votos
+                while(ultimoColocado.isCandidatoLegenda()){
+                    j++;
+                    ultimoColocado = candidatos.get(candidatos.size() - j);
                 }
-                */
+                
                 impressao = (i+1) + " - " + partido.getSigla() +
                     " - " + partido.getNumeroDoPartido()
                     + ", " + primeiroColocado.getNomeDeUrna() 
