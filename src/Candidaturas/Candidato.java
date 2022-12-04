@@ -55,7 +55,6 @@ public class Candidato {
         return nomeDeUrna;
     }
 
-    //TODO: TESTAR ISSO
     public String getDataDeNascimento() {
         return dataDeNascimento.toString();
     }
@@ -96,7 +95,6 @@ public class Candidato {
         return candidatoLegenda;
     }
 
-    //TODO: TESTAR ISSO
     //deve retornar a idade do candidato na data indicada em sua construção 
     public int getIdade(LocalDate dataEleicao){
         return (int) dataDeNascimento.until(dataEleicao, ChronoUnit.YEARS);
