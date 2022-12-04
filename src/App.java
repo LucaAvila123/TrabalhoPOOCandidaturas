@@ -10,7 +10,7 @@ import Candidaturas.Candidato;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        // PRIMEIRA PARTE: lidando com as entradas no terminal
+        // PRIMEIRA PARTE: nallidando com as entradas no termi
         // unzip <arquivo>.zip
         // ant compile
         // ant jar
